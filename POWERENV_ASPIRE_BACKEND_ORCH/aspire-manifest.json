@@ -1,0 +1,88 @@
+{
+  "resources": {
+    "RedisCache": {
+      "type": "container.v0",
+      "connectionString": "{RedisCache.bindings.tcp.host}:{RedisCache.bindings.tcp.port},password={RedisCache-password.value}{cond-rediscache-bindings-tcp-tlsenabled-b1371237.connectionString}",
+      "image": "docker.io/library/redis:8.6",
+      "entrypoint": "/bin/sh",
+      "args": [
+        "-c",
+        "redis-server --requirepass $REDIS_PASSWORD"
+      ],
+      "env": {
+        "REDIS_PASSWORD": "{RedisCache-password.value}"
+      },
+      "bindings": {
+        "tcp": {
+          "scheme": "redis",
+          "protocol": "tcp",
+          "transport": "tcp",
+          "targetPort": 6379
+        }
+      }
+    },
+    "MAIN-API": {
+      "type": "project.v0",
+      "path": "../POWERENV_BACKEND_API/POWERENV_BACKEND_API.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ASPNETCORE_FORWARDEDHEADERS_ENABLED": "true",
+        "HTTP_PORTS": "{MAIN-API.bindings.http.targetPort}",
+        "ConnectionStrings__RedisCache": "{RedisCache.connectionString}",
+        "REDISCACHE_HOST": "{RedisCache.bindings.tcp.host}",
+        "REDISCACHE_PORT": "{RedisCache.bindings.tcp.port}",
+        "REDISCACHE_PASSWORD": "{RedisCache-password.value}",
+        "REDISCACHE_URI": "{RedisCache.bindings.tcp.scheme}://:{RedisCache-password-uri-encoded.value}@{RedisCache.bindings.tcp.host}:{RedisCache.bindings.tcp.port}"
+      },
+      "bindings": {
+        "http": {
+          "scheme": "http",
+          "protocol": "tcp",
+          "transport": "http"
+        },
+        "https": {
+          "scheme": "https",
+          "protocol": "tcp",
+          "transport": "http"
+        }
+      }
+    },
+    "OSCONSOLE-WORKER": {
+      "type": "project.v0",
+      "path": "../POWERENV_OSCONSOLE_WORKER/POWERENV_OSCONSOLE_WORKER.csproj",
+      "env": {
+        "OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY": "in_memory",
+        "ConnectionStrings__RedisCache": "{RedisCache.connectionString}",
+        "REDISCACHE_HOST": "{RedisCache.bindings.tcp.host}",
+        "REDISCACHE_PORT": "{RedisCache.bindings.tcp.port}",
+        "REDISCACHE_PASSWORD": "{RedisCache-password.value}",
+        "REDISCACHE_URI": "{RedisCache.bindings.tcp.scheme}://:{RedisCache-password-uri-encoded.value}@{RedisCache.bindings.tcp.host}:{RedisCache.bindings.tcp.port}"
+      }
+    },
+    "RedisCache-password": {
+      "type": "parameter.v0",
+      "value": "{RedisCache-password.inputs.value}",
+      "inputs": {
+        "value": {
+          "type": "string",
+          "secret": true,
+          "default": {
+            "generate": {
+              "minLength": 22,
+              "special": false
+            }
+          }
+        }
+      }
+    },
+    "RedisCache-password-uri-encoded": {
+      "type": "annotated.string",
+      "value": "{RedisCache-password.value}",
+      "filter": "uri"
+    },
+    "cond-rediscache-bindings-tcp-tlsenabled-b1371237": {
+      "type": "value.v0",
+      "connectionString": ""
+    }
+  }
+}

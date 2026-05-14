@@ -1,0 +1,15 @@
+.vs/
+.git/
+.github/
+
+LOCAL_ONLY/
+
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+[Pp]roperties/
+[Pp]ackages/
+
+*.db
+*.pdf

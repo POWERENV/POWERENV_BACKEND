@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-POWERENV_OSCONSOLE_WORKER-3b4f8ecf-f5e4-4800-9f93-f2946f66505e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.12.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\POWERENV\POWERENV.csproj" />
+    <ProjectReference Include="..\POWERENV_SQLITE_DB_HANDLER\POWERENV_DB_HANDLER.csproj" />
+  </ItemGroup>
+</Project>
