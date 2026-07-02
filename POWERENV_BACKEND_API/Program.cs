@@ -31,6 +31,10 @@ namespace POWERENV_BACKEND_API
 
         public static void Main(string[] args)
         {
+            string? hostIPAddress = Environment.GetEnvironmentVariable("POWERENV_HOST_IPADDRESS");
+
+            if(hostIPAddress == null) return;
+
             var builder = WebApplication.CreateBuilder(args);
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -42,10 +46,10 @@ namespace POWERENV_BACKEND_API
             // Add services to the container.
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll",
+                options.AddPolicy("AllowFrontend",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://powerenv.hyperfield.com/", $"http://{hostIPAddress}/") // your frontend origin
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials();
@@ -72,7 +76,7 @@ namespace POWERENV_BACKEND_API
 
             app.MapHub<OS_TERMINAL_WSS_HUB>("/osTerminal");
 
-            app.UseCors("AllowAll");
+            app.UseCors("AllowFrontend");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -84,6 +88,7 @@ namespace POWERENV_BACKEND_API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
 
             app.MapControllers();
 
