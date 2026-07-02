@@ -49,7 +49,7 @@ namespace POWERENV_BACKEND_API
                 options.AddPolicy("AllowFrontend",
                     policy =>
                     {
-                        policy.WithOrigins("http://powerenv.hyperfield.com/", $"http://{hostIPAddress}/") // your frontend origin
+                        policy.WithOrigins("http://powerenv.hyperfield.com", $"http://{hostIPAddress}") // your frontend origin
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials();
