@@ -42,10 +42,10 @@ namespace POWERENV_BACKEND_API
             // Add services to the container.
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowFrontend",
+                options.AddPolicy("AllowAll",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost") // your frontend origin
+                        policy.AllowAnyOrigin()
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials();
@@ -72,7 +72,7 @@ namespace POWERENV_BACKEND_API
 
             app.MapHub<OS_TERMINAL_WSS_HUB>("/osTerminal");
 
-            app.UseCors("AllowFrontend");
+            app.UseCors("AllowAll");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -84,7 +84,6 @@ namespace POWERENV_BACKEND_API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
