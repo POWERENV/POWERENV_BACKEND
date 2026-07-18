@@ -48,7 +48,7 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText)
+        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor)
         {
             SQLITE_DB_CONNECTION_INFO connectionInfo = new SQLITE_DB_CONNECTION_INFO();
             connectionInfo.conn = new SqliteConnection(_connectionString);
@@ -66,9 +66,9 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
-        static internal SQLITE_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText)
+        static internal SQLITE_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
         {
-            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText);
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, hasCursor);
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText)
+        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure)
         {
             SQLITE_DB_CONNECTION_INFO connectionInfo = new SQLITE_DB_CONNECTION_INFO();
             connectionInfo.conn = new SqliteConnection(_connectionString);
@@ -95,9 +95,9 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
-        static internal SQLITE_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText)
+        static internal SQLITE_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = false)
         {
-            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText);
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, isStoredProcedure);
         }
     }
 }

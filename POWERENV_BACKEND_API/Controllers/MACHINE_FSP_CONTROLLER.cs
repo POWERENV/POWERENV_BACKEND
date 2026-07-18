@@ -174,7 +174,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 else
                 {
                     response.operationStatus = false;
-                    response.statusMessage = "ASMI Session started, but database not updated (database write fail)!";
+                    response.statusMessage = "ASMI Session started, but database not updated (internal parameter mismatch)!";
                 }
                 response.packetData = receivedData;
             }

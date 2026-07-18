@@ -1,4 +1,5 @@
-﻿using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+﻿using Npgsql;
+using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
 {
@@ -264,42 +265,23 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             if (DBPassword != null)
             {
-                //connectionString = $"Data Source={dataSourceDirPath}POWERDB.db";
                 connectionString = $"Host={DBIPAddress};Port={DBPort};Username=postgres;Password={DBPassword};Database=POWERENV-POWERDB";
             }
             else throw new Exception("FATAL ERROR: DATABASE KEYS NOT FOUND!");
+
+            NpgsqlDataSourceBuilder dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.MapComposite<STRUCT_FSP_ERROR_LOG_FRU_INFO>("ERROR_LOG_NHFRU_RECORD_LIST_TYPE");
+            NpgsqlDataSource dataSource = dataSourceBuilder.Build();
         }
 
         public List<STRUCT_PGRID_BASIC_INFO> DBGetPGrids()
         {
-            string sqlCommandText = "WITH " +
-                "PPOOL_COUNT_CTE AS ( " +
-                "SELECT " +
-                "PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID, " +
-                "COUNT(PPOOL_ID) AS PPOOL_COUNT " +
-                "FROM PPOOLS " +
-                "GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID" +
-                "), " +
-                "PNODE_COUNT_CTE AS " +
-                "(" +
-                "SELECT " +
-                "PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID, " +
-                "COUNT(PNODES.PNODE_ID) AS PNODE_COUNT " +
-                "FROM PNODES " +
-                "RIGHT JOIN PPOOLS ON PPOOLS.PPOOL_ID = PNODES.PNODE_ASSOCIATED_PPOOL_ID " +
-                "GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID" +
-                ") " +
-                "SELECT " +
-                "PGRIDS.PGRID_ID, " +
-                "PGRIDS.PGRID_NAME, " +
-                "COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0), " +
-                "COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) " +
-                "FROM PGRIDS " +
-                "INNER JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID " +
-                "INNER JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID " +
-                "ORDER BY pgrids.PGRID_ID;";
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_GET_PGRIDS_LIST('CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_PGRID_BASIC_INFO> pgridsBasicInfoList = new List<STRUCT_PGRID_BASIC_INFO>();
 

@@ -48,7 +48,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText)
+        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor)
         {
             PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO();
             connectionInfo.conn = new NpgsqlConnection(_connectionString);
@@ -56,6 +56,8 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
             connectionInfo.reader = cmd.ExecuteReader();
+
+            if (hasCursor) connectionInfo.reader.NextResult();
 
             return connectionInfo;
         }
@@ -66,9 +68,9 @@ namespace POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText)
+        static internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText);
+            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, hasCursor);
         }
 
         /// <summary>
@@ -77,14 +79,33 @@ namespace POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText)
+        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure)
         {
             PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO();
             connectionInfo.conn = new NpgsqlConnection(_connectionString);
             connectionInfo.conn.Open();
 
             var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
-            connectionInfo.rowsAffected = cmd.ExecuteNonQuery();
+
+            if (isStoredProcedure)
+            {
+                object? nonQueryResult = cmd.ExecuteScalar();
+
+                try
+                {
+                    connectionInfo.rowsAffected = Convert.ToInt32(nonQueryResult);
+                }
+                catch (Exception ex)
+                {
+                    connectionInfo.rowsAffected = -1;
+                    Console.WriteLine($"Error converting result to int: {ex.Message}");
+                }
+            }
+            else
+            {
+                int nonQueryResult = cmd.ExecuteNonQuery();
+                connectionInfo.rowsAffected = nonQueryResult;
+            }
 
             return connectionInfo;
         }
@@ -95,9 +116,9 @@ namespace POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText)
+        static internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = true)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText);
+            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, isStoredProcedure);
         }
     }
 }

@@ -32,28 +32,31 @@ namespace POWERENV_BACKEND_API
         public static void Main(string[] args)
         {
             string? hostIPAddress = Environment.GetEnvironmentVariable("POWERENV_HOST_IPADDRESS");
+            Console.WriteLine($"POWERENV_HOST_IPADDRESS: {hostIPAddress}");
 
-            if(hostIPAddress == null) return;
+            if (hostIPAddress == null) {
+                Console.WriteLine("POWERENV_HOST_IPADDRESS environment variable is not set.");
+                Console.WriteLine("Please set the environment variable and restart the application.");
+                return;
+            }
 
             var builder = WebApplication.CreateBuilder(args);
 
             builder.WebHost.ConfigureKestrel(serverOptions =>
             {
                 serverOptions.ListenAnyIP(5000); // Listens on all interfaces (equivalent to 0.0.0.0 and [::])
-                //serverOptions.ListenLocalhost(5000); // Listens in localhost
             });
 
             // Add services to the container.
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowFrontend",
-                    policy =>
-                    {
-                        policy.WithOrigins("http://powerenv.hyperfield.com", $"http://{hostIPAddress}") // your frontend origin
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials();
-                    });
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://powerenv.hyperfield.com", $"https://{hostIPAddress}")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader()
+                          .AllowCredentials();
+                });
             });
 
             builder.Services.AddControllers();

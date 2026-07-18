@@ -10,21 +10,12 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public List<STRUCT_PNODES_BASIC_INFO> DBGetPGPPoolPNodesList(int _targetPPoolID)
         {
-            string sqlCommandText = "WITH LPARS_COUNT_CTE AS ( " +
-                "SELECT " +
-                "LPAR_ASSOCIATED_PNODE_ID, " +
-                "COUNT(*) AS LPARS_COUNT " +
-                "FROM LPARS " +
-                "GROUP BY LPAR_ASSOCIATED_PNODE_ID ) " +
-                "SELECT " +
-                "PNODES.PNODE_ID, " +
-                "PNODES.PNODE_NICKNAME, " +
-                "COALESCE(LPARS_COUNT_CTE.LPARS_COUNT, 0) " +
-                "FROM PNODES " +
-                "LEFT JOIN LPARS_COUNT_CTE ON LPARS_COUNT_CTE.LPAR_ASSOCIATED_PNODE_ID = PNODES.PNODE_ID " +
-                $"WHERE PNODES.PNODE_ASSOCIATED_PPOOL_ID = {_targetPPoolID};";
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL sp_get_ppool_pnodes_list({_targetPPoolID}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_PNODES_BASIC_INFO> pnodesInfoList = new List<STRUCT_PNODES_BASIC_INFO>();
 
@@ -47,38 +38,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public STRUCT_PPOOL_FULL_INFO DBGetPPoolFullInfo(int _targetPPoolID)
         {
-            string sqlCommandText = "WITH PNODE_COUNT_CTE AS ( " +
-                "SELECT " +
-                "PNODES.PNODE_ASSOCIATED_PPOOL_ID, " +
-                "COUNT(*) AS PNODE_COUNT " +
-                "FROM PNODES " +
-                "GROUP BY PNODES.PNODE_ASSOCIATED_PPOOL_ID" +
-                "), " +
-                "ACTIVE_PNODE_COUNT_CTE AS ( " +
-                "SELECT " +
-                "PNODES.PNODE_ASSOCIATED_PPOOL_ID, " +
-                "COUNT(*) AS ACTIVE_PNODE_COUNT " +
-                "FROM PNODES " +
-                "INNER JOIN PNODE_STATUS ON PNODE_STATUS.PNODE_STATUS_ID = PNODES.PNODE_STATUS_ID " +
-                "WHERE PNODE_STATUS.PNODE_STATUS_NAME = 'ACTIVE' " +
-                "GROUP BY PNODES.PNODE_ASSOCIATED_PPOOL_ID" +
-                ") " +
-                "SELECT " +
-                "PPOOLS.PPOOL_ID, " +
-                "PPOOLS.PPOOL_NAME, " +
-                "PPOOLS.PPOOL_TAG, " +
-                "PGRIDS.PGRID_NAME, " +
-                "PPOOLS.PPOOL_CREATION_DATETIME, " +
-                "PPOOLS.PPOOL_LAST_UPDATE_DATETIME, " +
-                "PPOOLS.PPOOL_README_TEXT, " +
-                "COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0), " +
-                "COALESCE(ACTIVE_PNODE_COUNT_CTE.ACTIVE_PNODE_COUNT, 0) " +
-                "FROM PPOOLS " +
-                "INNER JOIN PGRIDS ON PGRIDS.PGRID_ID = PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID " +
-                "LEFT JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PNODE_ASSOCIATED_PPOOL_ID = PPOOLS.PPOOL_ID " +
-                "LEFT JOIN ACTIVE_PNODE_COUNT_CTE ON ACTIVE_PNODE_COUNT_CTE.PNODE_ASSOCIATED_PPOOL_ID = PPOOLS.PPOOL_ID " +
-                $"WHERE PPOOLS.PPOOL_ID = {_targetPPoolID}";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_FULL_INFO({_targetPPoolID}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             STRUCT_PPOOL_FULL_INFO pgridFullInfo = new STRUCT_PPOOL_FULL_INFO();
 
@@ -105,21 +69,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public List<STRUCT_NODES_LOGIN_AUDITS> DBGetPPoolsLoginAudits(int _targetPpool)
         {
-            string sqlCommandText = "SELECT " +
-                "NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_ID, " +
-                "NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_FSP_USER, " +
-                "NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_DATETIME, " +
-                "PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_NAME, " +
-                "NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_LOCATION, " +
-                "PNODES.PNODE_NICKNAME, " +
-                "PPOOLS.PPOOL_NAME " +
-                "FROM NODES_LOGIN_AUDITS " +
-                "INNER JOIN PNODE_LOGIN_STATUS ON NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_STATUS_ID = PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_ID " +
-                "INNER JOIN PNODES ON NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_TARGET_PNODE_ID = PNODES.PNODE_ID " +
-                "INNER JOIN PPOOLS ON PNODES.PNODE_ASSOCIATED_PPOOL_ID = PPOOLS.PPOOL_ID " +
-                $"WHERE PPOOLS.PPOOL_ID = {_targetPpool} " +
-                $"LIMIT 20;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_LOGIN_AUDITS({_targetPpool}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_NODES_LOGIN_AUDITS> pgridPnodesLoginAudits = new List<STRUCT_NODES_LOGIN_AUDITS>();
 
@@ -146,14 +100,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public List<STRUCT_ATTENTION_LED_PNODES_INFO> DBGetPPoolAttentionLEDPNodes(int _targetPpool)
         {
-            string sqlCommandText = "SELECT " +
-                "PNODES.PNODE_NICKNAME, " +
-                "PPOOLS.PPOOL_NAME " +
-                "FROM PNODES " +
-                "INNER JOIN PPOOLS ON PNODES.PNODE_ASSOCIATED_PPOOL_ID = PPOOLS.PPOOL_ID " +
-                $"WHERE PPOOLS.PPOOL_ID = {_targetPpool} AND PNODES.PANODE_ATTENTION_LED_STATE = 'ON' " +
-                $"LIMIT 20;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_ATTENTIONLED_PNODES({_targetPpool}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_ATTENTION_LED_PNODES_INFO> attentionLEDMarkedPNodesInfo = new List<STRUCT_ATTENTION_LED_PNODES_INFO>();
 
@@ -175,24 +126,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public List<STRUCT_FSP_ERROR_LOG_INFO> DBGetPPoolsErrorLogs(int _targetPpool)
         {
-            string sqlCommandText = "SELECT " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_FSP_ID, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_DATETIME, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_DRIVER_NAME, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_SUBSYSTEM, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_RAW_DATA, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_EVENT_SEVERITY, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_ACTION_FLAGS, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_ACTION_STATUS, " +
-                "PNODES_FSP_ERROR_LOGS.ERROR_LOG_REFERENCE_CODE, " +
-                "PNODES.PNODE_NICKNAME, " +
-                "PPOOLS.PPOOL_NAME " +
-                "FROM PNODES_FSP_ERROR_LOGS " +
-                "INNER JOIN PNODES ON PNODES_FSP_ERROR_LOGS.ERROR_LOG_SOURCE_PNODE_ID = PNODES.PNODE_ID " +
-                "INNER JOIN PPOOLS ON PNODES.PNODE_ASSOCIATED_PPOOL_ID = PPOOLS.PPOOL_ID " +
-                $"WHERE PPOOLS.PPOOL_ID = {_targetPpool} " +
-                $"LIMIT 10;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_ERROR_LOGS({_targetPpool}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_FSP_ERROR_LOG_INFO> pgridPnodesErrorLogs = new List<STRUCT_FSP_ERROR_LOG_INFO>();
 
@@ -234,27 +172,12 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         private List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY> DBGetPPoolPNodesSingleOperationLogs(int _targetPPoolID)
         {
-            string sqlCommandText = "SELECT " +
-                "PNODE_OPERATIONS.PNODE_OPERATION_ID, " +
-                "PNODE_OPERATION_CATEGORIES.OPERATION_CAT_NAME, " +
-                "PNODES.PNODE_NICKNAME, " +
-                "COALESCE(PNODE_OPERATIONS.OPERATION_BATCH_OPERATION_ID, -1), " +
-                "COALESCE(PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ACTION, '-1'), " +
-                "PNODE_OPERATIONS.OPERATION_ACTION, " +
-                "PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_NAME, " +
-                "PNODE_OPERATIONS.OPERATION_DATETIME, " +
-                "USERS.USER_FIRST_NAME || ' ' || USERS.USER_LAST_NAME " +
-                "FROM PNODE_OPERATIONS " +
-                "INNER JOIN PNODE_OPERATION_CATEGORIES ON PNODE_OPERATION_CATEGORIES.OPERATION_CAT_ID = PNODE_OPERATIONS.OPERATION_CAT_ID " +
-                "INNER JOIN PNODES ON PNODES.PNODE_ID = PNODE_OPERATIONS.OPERATION_SOURCE_PNODE_ID " +
-                "LEFT JOIN PPOOLS_BATCH_OPERATIONS ON PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ID = PNODE_OPERATIONS.OPERATION_BATCH_OPERATION_ID " +
-                "INNER JOIN PNODE_LOGIN_STATUS ON PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_ID = PNODE_OPERATIONS.OPERATION_COMPLETION_STATUS_ID " +
-                "INNER JOIN USERS ON USERS.USER_ID = PNODE_OPERATIONS.OPERATION_SOURCE_USER_ID " +
-                $"WHERE PNODES.PNODE_ASSOCIATED_PPOOL_ID = {_targetPPoolID} " +
-                $"ORDER BY PNODE_OPERATIONS.OPERATION_DATETIME DESC " +
-                $"LIMIT 50;";
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_PNODES_SINGLE_OPERATION_LOGS({_targetPPoolID}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY> ppoolPNodesSingleOperationHistory = new List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY>();
 
@@ -283,21 +206,12 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         private List<STRUCT_PPOOLS_BATCH_OPERATION_HISTORY> DBGetPPoolBatchOperationLogs(int _targetPPoolID)
         {
-            string sqlCommandText = "SELECT " +
-                "PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ID, " +
-                "PNODE_OPERATION_CATEGORIES.OPERATION_CAT_NAME, " +
-                "PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_SOURCE_PPOOL_ID, " +
-                "PPOOLS.PPOOL_NAME, " +
-                "PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ACTION, " +
-                "PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_DATETIME, " +
-                "USERS.USER_FIRST_NAME || ' ' || USERS.USER_LAST_NAME " +
-                "FROM PPOOLS_BATCH_OPERATIONS " +
-                "INNER JOIN PNODE_OPERATION_CATEGORIES ON PNODE_OPERATION_CATEGORIES.OPERATION_CAT_ID = PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_CAT_ID " +
-                "INNER JOIN PPOOLS ON PPOOLS.PPOOL_ID = PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_SOURCE_PPOOL_ID " +
-                "INNER JOIN USERS ON USERS.USER_ID = PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_SOURCE_USER_ID " +
-                $"WHERE PPOOLS.PPOOL_ID = {_targetPPoolID}";
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                $"CALL SP_GET_PPOOL_BATCH_OPERATION_LOGS({_targetPPoolID}, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
             List<STRUCT_PPOOLS_BATCH_OPERATION_HISTORY> ppoolBatchOperationHistory = new List<STRUCT_PPOOLS_BATCH_OPERATION_HISTORY>();
 
@@ -339,9 +253,9 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
         public int DBPPoolEditReadme(int ppoolID, string newReadmeText)
         {
-            string sqlCommandText = $"UPDATE PPOOLS " +
-                $"SET PPOOL_README_TEXT = '{newReadmeText}' " +
-                $"WHERE PPOOL_ID = {ppoolID};";
+            string sqlCommandText = $"BEGIN TRANSACTION;" +
+                $"CALL SP_PPOOL_EDIT_README({ppoolID}, '{newReadmeText}', NULL);" +
+                $"COMMIT;";
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
             return connectionInfo.rowsAffected;
