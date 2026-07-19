@@ -46,14 +46,14 @@ namespace POWERENV_OSCONSOLE_WORKER
                 for (int i = 0; i < currDBQueueList.Count(); i++)
                 {
                     lastI = i;
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(currDBQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(currDBQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
                     hasNewItems = !findSessionID(dbQueueList, sessionInfo.session_id);
                     if (hasNewItems) break;
                 }
 
                 if (hasNewItems && !currDBQueueList[lastI].IsNull)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO newSessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(currDBQueueList[lastI]); //currDBQueueList[lastI] is always non-null in this scope.
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(currDBQueueList[lastI]); //currDBQueueList[lastI] is always non-null in this scope.
 
                     updateUserCredentials(newSessionInfo.sessionTargetLPARInfo.lpar_target_pnode_id);
 
@@ -76,18 +76,18 @@ namespace POWERENV_OSCONSOLE_WORKER
             if (dbQueueList.Length > 0)
             {
                 bool hasRemovedItems = false;
-                PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO deletedSessionData = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO();
+                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo deletedSessionData = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo();
 
                 for (int i = 0; i < dbQueueList.Count(); i++)
                 {
                     if (!dbQueueList[i].IsNull)
                     {
-                        PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(dbQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
+                        PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(dbQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
                         hasRemovedItems = !findSessionID(currDBQueueList, sessionInfo.session_id);
 
                         if (hasRemovedItems)
                         {
-                            deletedSessionData = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(dbQueueList[i]); //dbQueueList[i] is always non-null in this scope.
+                            deletedSessionData = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(dbQueueList[i]); //dbQueueList[i] is always non-null in this scope.
                             break;
                         }
                     }
@@ -120,7 +120,7 @@ namespace POWERENV_OSCONSOLE_WORKER
             {
                 for (int i = 0; i < currDBQueueList.Count(); i++)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(currDBQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(currDBQueueList[i]); //currDBQueueList[i] is always non-null in this scope.
                     if (sessionInfo.pendingCommand.Length > 0)
                     {
                         for (int j = 0; j < XTelnetSessions.Count; j++)
@@ -162,7 +162,7 @@ namespace POWERENV_OSCONSOLE_WORKER
         /// <param name="_systemID"></param>
         private void updateUserCredentials(int _systemID)
         {
-            PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_LPAR_FULL_INFO osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.LPARFullInfo osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
             POWERENV.AuthManagementLib.OS_INFO = new AUTH_MGMT.STRUCT_OS_USER_INFO()
             {
                 os_id = osInfo.os_id,
@@ -176,11 +176,11 @@ namespace POWERENV_OSCONSOLE_WORKER
             };
         }
 
-        private bool findSessionID(RedisValue[] sessionQueue, int sessionID)
+        private bool findSessionID(RedisValue[] sessionQueue, int? sessionID)
         {
             for (int j = 0; j < sessionQueue.Length; j++)
             {
-                PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO pastSessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(sessionQueue[j]); //dbQueueList[j] is always non-null in this scope.
+                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo pastSessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(sessionQueue[j]); //dbQueueList[j] is always non-null in this scope.
                 if (pastSessionInfo.session_id == sessionID)
                 {
                     return true;

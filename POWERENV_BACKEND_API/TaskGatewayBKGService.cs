@@ -42,7 +42,7 @@ namespace POWERENV_BACKEND_API
                     {
                         if (!activeSessions[j].IsNull)
                         {
-                            PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO sessionData = System.Text.Json.JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(activeSessions[j]);
+                            PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo sessionData = System.Text.Json.JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(activeSessions[j]);
                             Console.WriteLine("I'M HERE!!!");
                             if (sessionData.WSSListenerConnectionID == streamEntries[i].Values[0].Value)
                             {

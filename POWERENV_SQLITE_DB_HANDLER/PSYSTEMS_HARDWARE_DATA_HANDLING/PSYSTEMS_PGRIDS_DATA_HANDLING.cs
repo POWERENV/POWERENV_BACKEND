@@ -6,7 +6,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
     {
         //============================PGRID DATA HANDLING METHODS============================//
 
-        public STRUCT_PGRID_FULL_INFO DBGetPGridFullInfo(int _targetPgridID)
+        public PGridFullInfo DBGetPGridFullInfo(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_FULL_INFO({_targetPgridID}, 'CURSOR');" +
@@ -14,11 +14,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            STRUCT_PGRID_FULL_INFO pgridFullInfo = new STRUCT_PGRID_FULL_INFO();
+            PGridFullInfo pgridFullInfo = new PGridFullInfo { };
 
             while (connectionInfo.reader.Read())
             {
-                pgridFullInfo = new STRUCT_PGRID_FULL_INFO()
+                pgridFullInfo = new PGridFullInfo
                 {
                     pgrid_id = $"PG-{connectionInfo.reader.GetInt32(0)}",
                     pgrid_name = connectionInfo.reader.GetString(1),
@@ -37,7 +37,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pgridFullInfo;
         }
 
-        public List<STRUCT_ACCESS_POLICY_INFO> DBGetPGAccessPolicies(int _targetPgridID)
+        public List<AccessPolicyInfo> DBGetPGAccessPolicies(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_ACCESSPOLICIES({_targetPgridID}, 'CURSOR');" +
@@ -45,11 +45,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_ACCESS_POLICY_INFO> accessPolicies = new List<STRUCT_ACCESS_POLICY_INFO>();
+            List<AccessPolicyInfo> accessPolicies = new List<AccessPolicyInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_ACCESS_POLICY_INFO accessPolicy = new STRUCT_ACCESS_POLICY_INFO()
+                AccessPolicyInfo accessPolicy = new AccessPolicyInfo
                 {
                     access_policy_id = connectionInfo.reader.GetInt32(0),
                     access_policy_name = connectionInfo.reader.GetString(1),
@@ -68,7 +68,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return accessPolicies;
         }
 
-        public List<STRUCT_ACCESS_AUDIT_INFO> DBGetPGAccessAudits(int _targetPgridID)
+        public List<AccessAuditInfo> DBGetPGAccessAudits(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_ACCESSAUDITS({_targetPgridID}, 'CURSOR');" +
@@ -76,11 +76,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_ACCESS_AUDIT_INFO> pgridAccessAudits = new List<STRUCT_ACCESS_AUDIT_INFO>();
+            List<AccessAuditInfo> pgridAccessAudits = new List<AccessAuditInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_ACCESS_AUDIT_INFO accessAudit = new STRUCT_ACCESS_AUDIT_INFO()
+                AccessAuditInfo accessAudit = new AccessAuditInfo
                 {
                     access_audit_id = connectionInfo.reader.GetInt32(0),
                     access_audit_datetime = connectionInfo.reader.GetDateTime(1).ToString(),
@@ -96,7 +96,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pgridAccessAudits;
         }
 
-        public List<STRUCT_NODES_LOGIN_AUDITS> DBGetPGPNLoginAudits(int _targetPgridID)
+        public List<NodesLoginAudits> DBGetPGPNLoginAudits(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_PNODES_LOGINAUDITS({_targetPgridID}, 'CURSOR');" +
@@ -104,11 +104,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_NODES_LOGIN_AUDITS> pgridPnodesLoginAudits = new List<STRUCT_NODES_LOGIN_AUDITS>();
+            List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_NODES_LOGIN_AUDITS pgridPnodeLoginAudit = new STRUCT_NODES_LOGIN_AUDITS()
+                NodesLoginAudits pgridPnodeLoginAudit = new NodesLoginAudits()
                 {
                     login_audit_id = connectionInfo.reader.GetInt32(0),
                     login_audit_fsp_user = connectionInfo.reader.GetString(1),
@@ -127,7 +127,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pgridPnodesLoginAudits;
         }
 
-        public List<STRUCT_FSP_ERROR_LOG_INFO> DBGetPGErrorLogs(int _targetPgridID)
+        public List<FSPErrorLogInfo> DBGetPGErrorLogs(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_ERROR_LOGS({_targetPgridID}, 'CURSOR');" +
@@ -135,7 +135,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_FSP_ERROR_LOG_INFO> pgridPnodesErrorLogs = new List<STRUCT_FSP_ERROR_LOG_INFO>();
+            List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
             while (connectionInfo.reader.Read())
             {
@@ -149,7 +149,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
                 string[] logDateNTime = connectionInfo.reader.GetDateTime(1).ToString().Split(" ");
 
-                STRUCT_FSP_ERROR_LOG_INFO pgridPnodeErrorLog = new STRUCT_FSP_ERROR_LOG_INFO()
+                FSPErrorLogInfo pgridPnodeErrorLog = new FSPErrorLogInfo()
                 {
                     ErrorLogID = connectionInfo.reader.GetString(0),
                     LogDate = logDateNTime[0],
@@ -173,7 +173,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pgridPnodesErrorLogs;
         }
 
-        public List<STRUCT_ATTENTION_LED_PNODES_INFO> DBGetAttentionLEDPNodes(int _targetPgridID)
+        public List<AttentionLEDPNodesInfo> DBGetAttentionLEDPNodes(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRID_ATTENTIONLED_PNODES({_targetPgridID}, 'CURSOR');" +
@@ -181,11 +181,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_ATTENTION_LED_PNODES_INFO> attentionLEDMarkedPNodesInfo = new List<STRUCT_ATTENTION_LED_PNODES_INFO>();
+            List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_ATTENTION_LED_PNODES_INFO attentionLEDMarkedPNodeInfo = new STRUCT_ATTENTION_LED_PNODES_INFO()
+                AttentionLEDPNodesInfo attentionLEDMarkedPNodeInfo = new AttentionLEDPNodesInfo()
                 {
                     pnode_nickname = connectionInfo.reader.GetString(0),
                     ppool_name = connectionInfo.reader.GetString(1)
@@ -199,7 +199,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return attentionLEDMarkedPNodesInfo;
         }
 
-        public List<STRUCT_PPOOLS_LIST> DBGetPGPPoolsList(int _targetPgridID)
+        public List<PPoolsList> DBGetPGPPoolsList(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PGRIDS_PPOOLS_LIST({_targetPgridID}, 'CURSOR');" +
@@ -208,11 +208,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_PPOOLS_LIST> ppoolsInfoList = new List<STRUCT_PPOOLS_LIST>();
+            List<PPoolsList> ppoolsInfoList = new List<PPoolsList>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_PPOOLS_LIST ppoolInfo = new STRUCT_PPOOLS_LIST()
+                PPoolsList ppoolInfo = new PPoolsList
                 {
                     ppoolID = connectionInfo.reader.GetInt32(0),
                     ppool_name = connectionInfo.reader.GetString(1),

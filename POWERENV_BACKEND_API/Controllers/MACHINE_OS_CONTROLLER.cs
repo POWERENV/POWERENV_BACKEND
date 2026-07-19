@@ -31,7 +31,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 Random rndEngine = new Random();
                 int newToken;
-                PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_LPAR_FULL_INFO targetLPARID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(pnode_id);
+                PSYSTEMS_HARDWARE_DATA_HANDLING.LPARFullInfo targetLPARID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(pnode_id);
                 bool canProceed = false;
 
                 do {
@@ -44,13 +44,7 @@ namespace POWERENV_BACKEND_API.Controllers
                     if (!currDBQueueList.Contains(newToken)) canProceed = true;
                 } while (!canProceed);
 
-                PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO()
-                {
-                    session_id = newToken,
-                    WSSListenerConnectionID = "-1",
-                    sessionTargetLPARInfo = targetLPARID,
-                    pendingCommand = ""
-                };
+                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
 
                 updateUserCredentials(targetLPARID.lpar_target_pnode_id);
 
@@ -58,7 +52,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 await db.ListRightPushAsync("osSessionQueue", jsonSessionInfo);
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "REMOTE_ACCESS",
                     operationSourcePNodeID = pnode_id,
@@ -103,13 +97,13 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 if(currDBQueueList.Length > 0)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO();
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
                     string targetSessionSerialized = string.Empty;
 
                     int c = 0;
                     for (int i = 0; i < currDBQueueList.Length; i++)
                     {
-                        targetSession = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(currDBQueueList[i]);
+                        targetSession = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(currDBQueueList[i]);
                         targetSessionSerialized = currDBQueueList[i];
 
                         if (targetSession.session_id == sessionID) break;
@@ -151,13 +145,13 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 if (currDBQueueList.Length > 0)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO();
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
                     string targetSessionSerialized = string.Empty;
 
                     int c = 0;
                     for (int i = 0; i < currDBQueueList.Length; i++)
                     {
-                        targetSession = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(currDBQueueList[i]);
+                        targetSession = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(currDBQueueList[i]);
                         targetSessionSerialized = currDBQueueList[i];
 
                         if (targetSession.session_id == sessionID) break;
@@ -190,7 +184,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
         private void updateUserCredentials(int _systemID)
         {
-            PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_LPAR_FULL_INFO osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.LPARFullInfo osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
             POWERENV.AuthManagementLib.OS_INFO = new AUTH_MGMT.STRUCT_OS_USER_INFO()
             {
                 os_id = osInfo.os_id,

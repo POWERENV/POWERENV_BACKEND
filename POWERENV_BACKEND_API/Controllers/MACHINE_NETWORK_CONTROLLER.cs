@@ -80,14 +80,14 @@ namespace POWERENV_BACKEND_API.Controllers
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
 
-                List<STRUCT_PNODE_NIC_INFO> pnodeNICS = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeNICsInfo(_systemID);
-                STRUCT_PNODE_NIC_INFO newNicInfo = new STRUCT_PNODE_NIC_INFO();
+                List<PNodeNICInfo> pnodeNICS = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeNICsInfo(_systemID);
+                PNodeNICInfo newNicInfo = new PNodeNICInfo();
 
                 for (int i = 0; i < pnodeNICS.Count; i++)
                 {
                     if (pnodeNICS[i].pnode_nic_name == $"eth{networkInterfaceConfigChangeData.eth_index}")
                     {
-                        newNicInfo = new STRUCT_PNODE_NIC_INFO()
+                        newNicInfo = new PNodeNICInfo()
                         {
                             pnode_nic_id = pnodeNICS[i].pnode_nic_id,
                             pnode_nic_name = pnodeNICS[i].pnode_nic_name,
@@ -110,7 +110,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeNICsInfo(newNicInfo);
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                 {
                     operationCatName = "NETWORK",
                     operationSourcePNodeID = _systemID,
@@ -196,7 +196,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 // Update Data on the Database
                 for (int i = 0; i < IPAddressesChangeData.indexes.Count; i++)
                 {
-                    STRUCT_PNODE_ETH_ACCESS_POLICY_INFO newETHAccessPolicy = new STRUCT_PNODE_ETH_ACCESS_POLICY_INFO()
+                    PNodeETHAccessPolicyInfo newETHAccessPolicy = new PNodeETHAccessPolicyInfo()
                     {
                         access_policy_index_id = IPAddressesChangeData.indexes[i],
                         access_policy_pnode_id = _systemID,
@@ -215,7 +215,7 @@ namespace POWERENV_BACKEND_API.Controllers
                         pnodeActivenessStateUpdateRowsAffected = UpdateAccessPoliciesIndexDB(newETHAccessPolicy);
                     }
 
-                    STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                    PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                     {
                         operationCatName = "NETWORK",
                         operationSourcePNodeID = _systemID,
@@ -253,7 +253,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 // Update Data on the Database
                 for (int i = 0; i < IPAddressesChangeData.indexes.Count; i++)
                 {
-                    STRUCT_PNODE_ETH_ACCESS_POLICY_INFO newETHAccessPolicy = new STRUCT_PNODE_ETH_ACCESS_POLICY_INFO()
+                    PNodeETHAccessPolicyInfo newETHAccessPolicy = new PNodeETHAccessPolicyInfo()
                     {
                         access_policy_index_id = IPAddressesChangeData.indexes[i],
                         access_policy_pnode_id = _systemID,
@@ -272,7 +272,7 @@ namespace POWERENV_BACKEND_API.Controllers
                         pnodeActivenessStateUpdateRowsAffected = UpdateAccessPoliciesIndexDB(newETHAccessPolicy);
                     }
 
-                    STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                    PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                     {
                         operationCatName = "NETWORK",
                         operationSourcePNodeID = _systemID,
@@ -322,16 +322,16 @@ namespace POWERENV_BACKEND_API.Controllers
             return responsesList.Last();
         }
 
-        private int UpdateAccessPoliciesIndexDB(STRUCT_PNODE_ETH_ACCESS_POLICY_INFO newETHAccessPolicy)
+        private int UpdateAccessPoliciesIndexDB(PNodeETHAccessPolicyInfo newETHAccessPolicy)
         {
             int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.deletePNodeETHAccessPolicy(newETHAccessPolicy);
-            List<STRUCT_PNODE_ETH_ACCESS_POLICY_INFO> accessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeETHAccessPolicies(newETHAccessPolicy.access_policy_pnode_id);
+            List<PNodeETHAccessPolicyInfo> accessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeETHAccessPolicies(newETHAccessPolicy.access_policy_pnode_id);
 
             for (int j = 0; j < accessPolicies.Count; j++)
             {
                 if (accessPolicies[j].access_policy_index_id > newETHAccessPolicy.access_policy_index_id && accessPolicies[j].access_policy_type == "ALLOW")
                 {
-                    STRUCT_PNODE_ETH_ACCESS_POLICY_INFO updatedPolicy = new STRUCT_PNODE_ETH_ACCESS_POLICY_INFO()
+                    PNodeETHAccessPolicyInfo updatedPolicy = new PNodeETHAccessPolicyInfo()
                     {
                         access_policy_id = accessPolicies[j].access_policy_id,
                         access_policy_index_id = accessPolicies[j].access_policy_index_id - 1,

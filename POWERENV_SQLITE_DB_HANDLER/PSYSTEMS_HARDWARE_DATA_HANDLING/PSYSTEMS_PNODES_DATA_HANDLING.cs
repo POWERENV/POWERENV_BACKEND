@@ -7,7 +7,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
         //============================PNODE DATA HANDLING METHODS============================//
 
         #region READ
-        public STRUCT_PNODE_FULL_INFO DBGetPNodeFullInfo(int _targetPNodeID)
+        public PNodeFullInfo DBGetPNodeFullInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_FULL_INFO({_targetPNodeID}, 'CURSOR');" +
@@ -15,11 +15,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            STRUCT_PNODE_FULL_INFO pnodeFullInfo = new STRUCT_PNODE_FULL_INFO();
+            PNodeFullInfo pnodeFullInfo = new PNodeFullInfo();
 
             while (connectionInfo.reader.Read())
             {
-                pnodeFullInfo = new STRUCT_PNODE_FULL_INFO()
+                pnodeFullInfo = new PNodeFullInfo()
                 {
                     pnode_id = connectionInfo.reader.GetInt32(0),
                     pnode_nickname = connectionInfo.reader.GetString(1),
@@ -39,7 +39,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeFullInfo;
         }
 
-        public STRUCT_PNODE_FSP_INFO DBGetPNodeFSPInfo(int _targetPNodeID)
+        public PNodeFSPInfo DBGetPNodeFSPInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_FSP_INFO({_targetPNodeID}, 'CURSOR');" +
@@ -47,7 +47,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            STRUCT_PNODE_FSP_INFO pnodeFSPInfo = new STRUCT_PNODE_FSP_INFO();
+            PNodeFSPInfo pnodeFSPInfo = new PNodeFSPInfo();
 
             while (connectionInfo.reader.Read())
             {
@@ -58,7 +58,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
                     passphrase += "*";
                 }
 
-                pnodeFSPInfo = new STRUCT_PNODE_FSP_INFO()
+                pnodeFSPInfo = new PNodeFSPInfo()
                 {
                     pnode_fsp_id = connectionInfo.reader.GetInt32(0),
                     pnode_fsp_asmi_version = connectionInfo.reader.GetString(1),
@@ -73,7 +73,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeFSPInfo;
         }
 
-        public STRUCT_PNODE_MACHINE_INFO DBGetPNodeMachineInfo(int _targetPNodeID)
+        public PNodeMachineInfo DBGetPNodeMachineInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_MACHINE_INFO({_targetPNodeID}, 'CURSOR');" +
@@ -81,11 +81,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            STRUCT_PNODE_MACHINE_INFO pnodeMachineInfo = new STRUCT_PNODE_MACHINE_INFO();
+            PNodeMachineInfo pnodeMachineInfo = new PNodeMachineInfo();
 
             while (connectionInfo.reader.Read())
             {
-                pnodeMachineInfo = new STRUCT_PNODE_MACHINE_INFO()
+                pnodeMachineInfo = new PNodeMachineInfo()
                 {
                     pnode_system_model_name = connectionInfo.reader.GetString(0),
                     pnode_machine_type_model = connectionInfo.reader.GetString(1),
@@ -99,7 +99,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeMachineInfo;
         }
 
-        public List<STRUCT_PNODE_NIC_INFO> DBGetPNodeNICsInfo(int _targetPNodeID)
+        public List<PNodeNICInfo> DBGetPNodeNICsInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_NICS_INFO({_targetPNodeID}, 'CURSOR');" +
@@ -107,11 +107,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_PNODE_NIC_INFO> pnodeNICsInfo = new List<STRUCT_PNODE_NIC_INFO>();
+            List<PNodeNICInfo> pnodeNICsInfo = new List<PNodeNICInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_PNODE_NIC_INFO pnodeIndividualNICInfo = new STRUCT_PNODE_NIC_INFO()
+                PNodeNICInfo pnodeIndividualNICInfo = new PNodeNICInfo
                 {
                     pnode_nic_id = connectionInfo.reader.GetInt32(0),
                     pnode_nic_name = connectionInfo.reader.GetString(1),
@@ -136,7 +136,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeNICsInfo;
         }
 
-        public List<STRUCT_PNODE_ETH_ACCESS_POLICY_INFO> DBGetPNodeETHAccessPolicies(int _targetPNodeID)
+        public List<PNodeETHAccessPolicyInfo> DBGetPNodeETHAccessPolicies(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_ETH_ACCESS_POLICIES({_targetPNodeID}, 'CURSOR');" +
@@ -144,11 +144,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_PNODE_ETH_ACCESS_POLICY_INFO> pnodeETHAccessPoliciesInfo = new List<STRUCT_PNODE_ETH_ACCESS_POLICY_INFO>();
+            List<PNodeETHAccessPolicyInfo> pnodeETHAccessPoliciesInfo = new List<PNodeETHAccessPolicyInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_PNODE_ETH_ACCESS_POLICY_INFO pnodeIndividualNICInfo = new STRUCT_PNODE_ETH_ACCESS_POLICY_INFO()
+                PNodeETHAccessPolicyInfo pnodeIndividualNICInfo = new PNodeETHAccessPolicyInfo()
                 {
                     access_policy_id = connectionInfo.reader.GetInt32(0),
                     access_policy_index_id = connectionInfo.reader.GetInt32(1),
@@ -164,7 +164,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeETHAccessPoliciesInfo;
         }
 
-        public List<STRUCT_NODES_LOGIN_AUDITS> DBGetPNodesLoginAudits(int _targetPNode)
+        public List<NodesLoginAudits> DBGetPNodesLoginAudits(int _targetPNode)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODES_LOGIN_AUDITS({_targetPNode}, 'CURSOR');" +
@@ -172,11 +172,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
-            List<STRUCT_NODES_LOGIN_AUDITS> pnodesLoginAudits = new List<STRUCT_NODES_LOGIN_AUDITS>();
+            List<NodesLoginAudits> pnodesLoginAudits = new List<NodesLoginAudits>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_NODES_LOGIN_AUDITS pnodeLoginAudit = new STRUCT_NODES_LOGIN_AUDITS()
+                NodesLoginAudits pnodeLoginAudit = new NodesLoginAudits
                 {
                     login_audit_id = connectionInfo.reader.GetInt32(0),
                     login_audit_fsp_user = connectionInfo.reader.GetString(1),
@@ -194,7 +194,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodesLoginAudits;
         }
 
-        public List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY> DBGetPNodeOperationLogs(int _targetPNodeID)
+        public List<PNodesSingleOperationHistory> DBGetPNodeOperationLogs(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_OPERATION_LOGS({_targetPNodeID}, 'CURSOR');" +
@@ -202,11 +202,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 "COMMIT;";
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
-            List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY> ppoolPNodesSingleOperationHistory = new List<STRUCT_PNODES_SINGLE_OPERATION_HISTORY>();
+            List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY ppoolPNodesSingleOperationLog = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory ppoolPNodesSingleOperationLog = new PNodesSingleOperationHistory()
                 {
                     operationID = connectionInfo.reader.GetInt32(0),
                     operationCatName = connectionInfo.reader.GetString(1),
@@ -227,7 +227,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return ppoolPNodesSingleOperationHistory;
         }
 
-        public List<STRUCT_FSP_ERROR_LOG_INFO> DBGetPNodesErrorLogs(int _targetPNode)
+        public List<FSPErrorLogInfo> DBGetPNodesErrorLogs(int _targetPNode)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODES_ERROR_LOGS({_targetPNode}, 'CURSOR');" +
@@ -236,7 +236,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_FSP_ERROR_LOG_INFO> pnodeErrorLogs = new List<STRUCT_FSP_ERROR_LOG_INFO>();
+            List<FSPErrorLogInfo> pnodeErrorLogs = new List<FSPErrorLogInfo>();
 
             while (connectionInfo.reader.Read())
             {
@@ -250,7 +250,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
                 string[] logDateNTime = connectionInfo.reader.GetDateTime(1).ToString().Split(" ");
 
-                STRUCT_FSP_ERROR_LOG_INFO pnodeErrorLog = new STRUCT_FSP_ERROR_LOG_INFO()
+                FSPErrorLogInfo pnodeErrorLog = new FSPErrorLogInfo()
                 {
                     ErrorLogID = connectionInfo.reader.GetString(0),
                     LogDate = logDateNTime[0],
@@ -273,7 +273,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return pnodeErrorLogs;
         }
 
-        public List<STRUCT_LPAR_BASIC_INFO> DBGetPNodeLPARS(int PNode_ID)
+        public List<LPARBasicInfo> DBGetPNodeLPARS(int PNode_ID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_LPARS({PNode_ID}, 'CURSOR');" +
@@ -282,11 +282,11 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
-            List<STRUCT_LPAR_BASIC_INFO> lparsInfo = new List<STRUCT_LPAR_BASIC_INFO>();
+            List<LPARBasicInfo> lparsInfo = new List<LPARBasicInfo>();
 
             while (connectionInfo.reader.Read())
             {
-                STRUCT_LPAR_BASIC_INFO lparInfo = new STRUCT_LPAR_BASIC_INFO()
+                LPARBasicInfo lparInfo = new LPARBasicInfo
                 {
                     lpar_id = connectionInfo.reader.GetInt32(0),
                     lpar_name = connectionInfo.reader.GetString(1),
@@ -303,7 +303,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return lparsInfo;
         }
 
-        public STRUCT_LPAR_FULL_INFO DBGetPNodeMainOSLPARInfo(int PNode_ID)
+        public LPARFullInfo DBGetPNodeMainOSLPARInfo(int PNode_ID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_GET_PNODE_MAIN_OS_LPAR_INFO({PNode_ID}, 'CURSOR');" +
@@ -314,22 +314,22 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             connectionInfo.reader.Read();
 
-            STRUCT_AUTH_INFO osAuthInfo = new STRUCT_AUTH_INFO()
-            {
-                username = connectionInfo.reader.GetString(1),
-                password = connectionInfo.reader.GetString(2)
-            };
+            AuthInfo osAuthInfo = new AuthInfo(
+                connectionInfo.reader.GetString(1),
+                connectionInfo.reader.GetString(2)
+            );
 
-            STRUCT_LPAR_FULL_INFO osInfo = new STRUCT_LPAR_FULL_INFO() {
+            LPARFullInfo osInfo = new LPARFullInfo
+            {
+                lpar_id = connectionInfo.reader.GetInt32(5),
+                lpar_name = connectionInfo.reader.GetString(6),
+                is_main_os_host = true,
+                lpar_storage_size = connectionInfo.reader.GetInt32(7),
+                lpar_target_pnode_id = PNode_ID,
                 os_id = connectionInfo.reader.GetInt32(0),
                 osAuthInfo = osAuthInfo,
                 os_ip_address = connectionInfo.reader.GetString(3),
-                os_family = connectionInfo.reader.GetString(4),
-                is_main_os_host = true,
-                lpar_id = connectionInfo.reader.GetInt32(5),
-                lpar_name = connectionInfo.reader.GetString(6),
-                lpar_storage_size = connectionInfo.reader.GetInt32(7),
-                lpar_target_pnode_id = PNode_ID
+                os_family = connectionInfo.reader.GetString(4)
             };
 
             connectionInfo.conn.Close();
@@ -358,7 +358,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int updatePNodeNICsInfo(STRUCT_PNODE_NIC_INFO _newNICInfo)
+        public int updatePNodeNICsInfo(PNodeNICInfo _newNICInfo)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_UPDATE_PNODE_NICS_INFO({ _newNICInfo.pnode_id }," +
@@ -381,7 +381,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int insertPNodeETHAccessPolicy(STRUCT_PNODE_ETH_ACCESS_POLICY_INFO newETHAccessPolicy)
+        public int insertPNodeETHAccessPolicy(PNodeETHAccessPolicyInfo newETHAccessPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODE_ETH_ACCESS_POLICY({newETHAccessPolicy.access_policy_pnode_id}," +
@@ -395,7 +395,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int updatePNodeETHAccessPolicies(STRUCT_PNODE_ETH_ACCESS_POLICY_INFO _updatedPolicy)
+        public int updatePNodeETHAccessPolicies(PNodeETHAccessPolicyInfo _updatedPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_UPDATE_PNODE_ETH_ACCESS_POLICIES({ _updatedPolicy.access_policy_index_id }," +
@@ -409,7 +409,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int deletePNodeETHAccessPolicy(STRUCT_PNODE_ETH_ACCESS_POLICY_INFO ETHAccessPolicy)
+        public int deletePNodeETHAccessPolicy(PNodeETHAccessPolicyInfo ETHAccessPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_DELETE_PNODE_ETH_ACCESS_POLICY({ETHAccessPolicy.access_policy_index_id}," +
@@ -422,7 +422,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int DBInsertPNodeSingleOperation(STRUCT_PNODES_SINGLE_OPERATION_HISTORY OperationData)
+        public int DBInsertPNodeSingleOperation(PNodesSingleOperationHistory OperationData)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODE_SINGLE_OPERATION('{OperationData.operationCatName}'," +
@@ -462,7 +462,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int DBInsertPNodeErrorLog(int _PNodeID, PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO _currErrorLog)
+        public int DBInsertPNodeErrorLog(int _PNodeID, PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo _currErrorLog)
         {
             string actionFlags = "";
 
@@ -497,7 +497,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        private int DBInsertPNodeErrorLogNHFRURecord(PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_FRU_INFO NHFRURecord, int errorLogDBID)
+        private int DBInsertPNodeErrorLogNHFRURecord(PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo NHFRURecord, int errorLogDBID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODE_ERROR_LOG_NHFRU_RECORD({NHFRURecord}, {errorLogDBID}, NULL);" +
@@ -507,7 +507,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
-        public int DBInsertPNodesLoginAudits(int _targetPNode, PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS loginAudit)
+        public int DBInsertPNodesLoginAudits(int _targetPNode, PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits loginAudit)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODES_LOGIN_AUDITS(" +

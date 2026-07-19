@@ -35,7 +35,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 1);
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY() {
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory() {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodePowerOn",
@@ -75,7 +75,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 2);
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
@@ -116,7 +116,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 1);
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
@@ -157,7 +157,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeAttentionLEDState(_systemID, "OFF");
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
@@ -186,7 +186,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
         private void updateUserCredentials(int _systemID)
         {
-            PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_LPAR_FULL_INFO osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.LPARFullInfo osInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(_systemID);
             POWERENV.AuthManagementLib.OS_INFO = new AUTH_MGMT.STRUCT_OS_USER_INFO()
             {
                 os_id = osInfo.os_id,

@@ -19,7 +19,7 @@
         public string MYHOST { get => MyHost; set => MyHost = value; }
         public int SessionID { get => sessionID; set => sessionID = value; }
 
-        public XTELNET_COMMAND(int _connectionTimeOut, string _host, int _timeOut, int _retryCount, int _sessionID = -1)
+        public XTELNET_COMMAND(int _connectionTimeOut, string _host, int _timeOut, int _retryCount, int? _sessionID = -1)
         {
             MyConnectionimeOut = _connectionTimeOut;
             MyHost = _host;
@@ -27,7 +27,7 @@
             MyTimeOut = _timeOut;
             s = "";
             prompt = "";
-            sessionID = _sessionID;
+            sessionID = _sessionID ?? -1;
         }
 
         public void Login(string _username, string _password)

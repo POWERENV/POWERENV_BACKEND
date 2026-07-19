@@ -68,11 +68,11 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 POWERENVEngine.CloseSerialConnection();
 
-                List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS> dbLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesLoginAudits(_systemID);
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> dbLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesLoginAudits(_systemID);
 
                 for (int i = 0; i < authLogs.Count; i++)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS loginAudit = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS() {
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits loginAudit = new PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits {
                         login_audit_location = authLogs[i].location,
                         login_audit_datetime = $"{authLogs[i].date} {authLogs[i].time}",
                         login_audit_fsp_user = authLogs[i].user,
@@ -108,7 +108,7 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
-        private bool listContainsLoginAudit(List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS> dbLoginAudits, PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_NODES_LOGIN_AUDITS loginAudit)
+        private bool listContainsLoginAudit(List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> dbLoginAudits, PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits loginAudit)
         {
             for (int i = 0; i < dbLoginAudits.Count; i++)
             {

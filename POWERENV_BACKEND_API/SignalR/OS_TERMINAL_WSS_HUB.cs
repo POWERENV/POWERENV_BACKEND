@@ -31,7 +31,7 @@ namespace POWERENV_BACKEND_API.SignalR
                 {
                     if (!queueList[i].IsNull)
                     {
-                        PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_OSCONN_SESSION_INFO>(queueList[i]); //queueList[i] is always non-null in this scope.
+                        PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo sessionInfo = JsonSerializer.Deserialize<PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo>(queueList[i]); //queueList[i] is always non-null in this scope.
 
                         if (sessionInfo.session_id == sessionID && sessionInfo.WSSListenerConnectionID == "-1")
                         {

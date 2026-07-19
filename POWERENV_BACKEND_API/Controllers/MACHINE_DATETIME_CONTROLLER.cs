@@ -113,7 +113,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 };
             }
 
-            STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+            PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
             {
                 operationCatName = "FSP",
                 operationSourcePNodeID = _systemID,

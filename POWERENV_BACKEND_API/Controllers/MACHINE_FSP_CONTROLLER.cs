@@ -58,15 +58,15 @@ namespace POWERENV_BACKEND_API.Controllers
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
 
-                List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO> DBErrorLogInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesErrorLogs(_systemID);
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> DBErrorLogInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesErrorLogs(_systemID);
 
                 for (int i = 0; i < errorLogInfo.Count; i++)
                 {
-                    List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_FRU_INFO> fruInfoList = new List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_FRU_INFO>();
+                    List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo> fruInfoList = new List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo>();
 
                     for (int j = 0; j < errorLogInfo[i].NormalHardwareFRU.Count; j++)
                     {
-                        PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_FRU_INFO _FSP_ERROR_LOG_FRU_INFO = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_FRU_INFO()
+                        PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo _FSP_ERROR_LOG_FRU_INFO = new PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo
                         {
                             CCIN = errorLogInfo[i].NormalHardwareFRU[j].CCIN,
                             LocationCode = errorLogInfo[i].NormalHardwareFRU[j].LocationCode,
@@ -78,7 +78,7 @@ namespace POWERENV_BACKEND_API.Controllers
                         fruInfoList.Add(_FSP_ERROR_LOG_FRU_INFO);
                     }
 
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO currentErrorLog = new PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO() {
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo currentErrorLog = new PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo() {
                         ErrorLogID = errorLogInfo[i].ErrorLogID,
                         LogDate = POWERENV.DatetimeMgmt.changeDateStringFormat(errorLogInfo[i].LogDate.Replace("/", "-"), new int[] { 2, 0, 1 }), // Convert date format from MM/DD/YYYY to YYYY-MM-DD
                         LogTime = errorLogInfo[i].LogTime,
@@ -155,7 +155,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 POWER_ENV.POWERENV.SendCommand("\n", 500);
                 string receivedData = POWER_ENV.POWERENV.GetReceivedData();
 
-                STRUCT_PNODES_SINGLE_OPERATION_HISTORY PowerOnOperationData = new STRUCT_PNODES_SINGLE_OPERATION_HISTORY()
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                 {
                     operationCatName = "REMOTE_ACCESS",
                     operationSourcePNodeID = _systemID,
@@ -227,7 +227,7 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
-        private bool listContainsErrorLog(List<PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO> dbErrorLogs, PSYSTEMS_HARDWARE_DATA_HANDLING.STRUCT_FSP_ERROR_LOG_INFO errorLog)
+        private bool listContainsErrorLog(List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> dbErrorLogs, PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo errorLog)
         {
             for(int i = 0; i < dbErrorLogs.Count; i++)
             {
