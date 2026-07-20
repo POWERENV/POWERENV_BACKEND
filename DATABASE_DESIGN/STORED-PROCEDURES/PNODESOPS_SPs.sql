@@ -1,0 +1,648 @@
+--region READ PROCEDURES
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_FULL_INFO (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES.PNODE_ID,
+                   PNODES.PNODE_NICKNAME,
+                   PPOOLS.PPOOL_NAME,
+                   PNODES.PNODE_CREATION_DATETIME,
+                   PNODES.PNODE_LAST_UPDATE_DATETIME,
+                   PNODES.PNODE_SYSTEM_MODEL_NAME,
+                   PNODES.PNODE_MACHINE_TYPE_MODEL,
+                   PNODES.PNODE_MACHINE_SERIAL_NUMBER,
+                   PNODES.PNODE_SYSTEM_PSERIES,
+                   PNODES.PNODE_LAST_HEARTBEAT_DATETIME,
+                   PNODES.PANODE_ATTENTION_LED_STATE,
+                   PNODES.PNODE_README_TEXT,
+                   PNODE_STATUS.PNODE_STATUS_NAME,
+                   PNODES.PNODE_SERIAL_COM_PORT
+            FROM PNODES
+                     INNER JOIN PPOOLS ON PPOOLS.PPOOL_ID = PNODES.PNODE_ASSOCIATED_PPOOL_ID
+                     INNER JOIN PNODE_STATUS ON PNODE_STATUS.PNODE_STATUS_ID = PNODES.PNODE_STATUS_ID
+                     INNER JOIN PNODES_FSP_INFO ON PNODES_FSP_INFO.PNODE_FSP_ID = PNODES.PNODE_FSP_ID
+            WHERE PNODES.PNODE_ID = _targetPNodeID;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_FSP_INFO (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES_FSP_INFO.PNODE_FSP_ID,
+                   PNODES_FSP_INFO.PNODE_FSP_ASMI_VERSION,
+                   PNODES_FSP_INFO.PNODE_FSP_ASMI_USERNAME,
+                   PNODES_FSP_INFO.PNODE_FSP_ASMI_PASSWORD_HASH,
+                   PNODES_FSP_INFO.PNODE_FSP_ASMI_LOCAL_DATETIME
+            FROM PNODES
+                     INNER JOIN PNODES_FSP_INFO ON PNODES_FSP_INFO.PNODE_FSP_ID = PNODES.PNODE_FSP_ID
+            WHERE PNODES.PNODE_ID = _targetPNodeID;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_MACHINE_INFO (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES.PNODE_SYSTEM_MODEL_NAME,
+                   PNODES.PNODE_MACHINE_TYPE_MODEL,
+                   PNODES.PNODE_MACHINE_SERIAL_NUMBER,
+                   PNODES.PNODE_SYSTEM_PSERIES
+            FROM PNODES
+            WHERE PNODES.PNODE_ID = _targetPNodeID;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_NICS_INFO (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES_NIC_INFO.PNODE_NIC_ID,
+                   PNODES_NIC_INFO.PNODE_NIC_NAME,
+                   PNODES_NIC_INFO.PNODE_NIC_MAC_ADDRESS,
+                   PNODES_NIC_INFO.PNODE_NIC_IP_ADDRESS,
+                   PNODES_NIC_INFO.PNODE_NIC_IP_ADDRESS_TYPE,
+                   PNODES_NIC_INFO.PNODE_NIC_SUBNETMASK,
+                   PNODES_NIC_INFO.PNODE_NIC_DEFAULT_GATEWAY,
+                   PNODES_NIC_INFO.PNODE_NIC_HOSTNAME,
+                   COALESCE(PNODES_NIC_INFO.PNODE_NIC_DOMAIN_NAME, 'NONE') AS PNODE_NIC_DOMAIN_NAME,
+                   COALESCE(PNODES_NIC_INFO.PNODE_NIC_FIRST_DNS_SERVER_IP_ADDRESS, 'NONE') AS PNODE_NIC_FIRST_DNS_SERVER_IP_ADDRESS,
+                   COALESCE(PNODES_NIC_INFO.PNODE_NIC_SECOND_DNS_SERVER_IP_ADDRESS, 'NONE') AS PNODE_NIC_SECOND_DNS_SERVER_IP_ADDRESS,
+                   COALESCE(PNODES_NIC_INFO.PNODE_NIC_THIRD_DNS_SERVER_IP_ADDRESS, 'NONE') AS PNODE_NIC_THIRD_DNS_SERVER_IP_ADDRESS,
+                   PNODES_NIC_INFO.PNODE_NIC_TYPE
+            FROM PNODES_NIC_INFO
+            WHERE PNODES_NIC_INFO.PNODE_NICE_TARGET_PNODE_ID = _targetPNodeID
+            ORDER BY PNODES_NIC_INFO.PNODE_NIC_ID ASC;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_ETH_ACCESS_POLICIES (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_ID,
+                   PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_IP_INDEX,
+                   PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_IP_ADDRESS,
+                   ACCESS_POLICY_TYPE.TYPE_NAME
+            FROM PNODES_ETH_ACCESS_POLICIES
+                     INNER JOIN ACCESS_POLICY_TYPE
+                                ON ACCESS_POLICY_TYPE.TYPE_ID = PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_TYPE
+            WHERE PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_PNODE_ID = _targetPNodeID;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODES_LOGIN_AUDITS (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_ID,
+                   NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_FSP_USER,
+                   NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_DATETIME,
+                   PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_NAME,
+                   NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_LOCATION,
+                   PNODES.PNODE_NICKNAME
+            FROM NODES_LOGIN_AUDITS
+                     INNER JOIN PNODE_LOGIN_STATUS ON NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_STATUS_ID = PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_ID
+                     INNER JOIN PNODES ON NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_TARGET_PNODE_ID = PNODES.PNODE_ID
+            WHERE PNODES.PNODE_ID = _targetPNodeID
+            ORDER BY NODES_LOGIN_AUDITS.PNODE_LOGIN_AUDIT_DATETIME DESC;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_OPERATION_LOGS (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODE_OPERATIONS.PNODE_OPERATION_ID,
+                   PNODE_OPERATION_CATEGORIES.OPERATION_CAT_NAME,
+                   PNODES.PNODE_NICKNAME,
+                   COALESCE(PNODE_OPERATIONS.OPERATION_BATCH_OPERATION_ID, -1) AS OPERATION_BATCH_OPERATION_ID,
+                   COALESCE(PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ACTION, '-1') AS BATCH_OPERATION_ACTION,
+                   PNODE_OPERATIONS.OPERATION_ACTION,
+                   PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_NAME,
+                   PNODE_OPERATIONS.OPERATION_DATETIME,
+                   USERS.USER_FIRST_NAME || ' ' || USERS.USER_LAST_NAME
+            FROM PNODE_OPERATIONS
+                     INNER JOIN PNODE_OPERATION_CATEGORIES ON PNODE_OPERATION_CATEGORIES.OPERATION_CAT_ID = PNODE_OPERATIONS.OPERATION_CAT_ID
+                     INNER JOIN PNODES ON PNODES.PNODE_ID = PNODE_OPERATIONS.OPERATION_SOURCE_PNODE_ID
+                     LEFT JOIN PPOOLS_BATCH_OPERATIONS ON PPOOLS_BATCH_OPERATIONS.BATCH_OPERATION_ID = PNODE_OPERATIONS.OPERATION_BATCH_OPERATION_ID
+                     INNER JOIN PNODE_LOGIN_STATUS ON PNODE_LOGIN_STATUS.PNODE_LOGIN_STATUS_ID = PNODE_OPERATIONS.OPERATION_COMPLETION_STATUS_ID
+                     INNER JOIN USERS ON USERS.USER_ID = PNODE_OPERATIONS.OPERATION_SOURCE_USER_ID
+            WHERE PNODES.PNODE_ID = _targetPNodeID
+            ORDER BY PNODE_OPERATIONS.OPERATION_DATETIME DESC;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODES_ERROR_LOGS (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODES_FSP_ERROR_LOGS.ERROR_LOG_FSP_ID,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_DATETIME,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_DRIVER_NAME,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_SUBSYSTEM,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_RAW_DATA,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_EVENT_SEVERITY,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_ACTION_FLAGS,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_ACTION_STATUS,
+                   PNODES_FSP_ERROR_LOGS.ERROR_LOG_REFERENCE_CODE,
+                   PNODES.PNODE_NICKNAME
+            FROM PNODES_FSP_ERROR_LOGS
+                     INNER JOIN PNODES ON PNODES_FSP_ERROR_LOGS.ERROR_LOG_SOURCE_PNODE_ID = PNODES.PNODE_ID
+            WHERE PNODES.PNODE_ID = _targetPNodeID
+            ORDER BY PNODES_FSP_ERROR_LOGS.ERROR_LOG_DATETIME DESC;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_LPARS (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT LPAR_ID,
+                   LPAR_NAME,
+                   LPAR_ASSOCIATED_OS_INSTANCE_ID,
+                   LPAR_IS_MAIN_PNODE_OS,
+                   LPAR_STORAGE_SIZE
+            FROM LPARS
+            WHERE LPAR_ASSOCIATED_PNODE_ID = _targetPNodeID;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_PNODE_MAIN_OS_LPAR_INFO (
+    _targetPNodeID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            SELECT PNODE_OS_ID,
+                   PNODE_OS_USERNAME,
+                   PNODE_OS_PASSWORD_HASH,
+                   PNODE_OS_IP_ADDRESS,
+                   PNODE_OS_FAMILY,
+                   LPARS.LPAR_ID,
+                   LPARS.LPAR_NAME,
+                   LPARS.LPAR_STORAGE_SIZE
+            FROM PNODE_OS_USER_INFO
+                     INNER JOIN LPARS ON LPARS.LPAR_ASSOCIATED_OS_INSTANCE_ID = PNODE_OS_USER_INFO.PNODE_OS_ID
+            WHERE LPARS.LPAR_ASSOCIATED_PNODE_ID = _targetPNodeID
+              AND LPARS.LPAR_IS_MAIN_PNODE_OS = TRUE;
+    END;
+$$;
+
+--endregion
+
+--region WRITE PROCEDURES
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_PNODE_ACTIVENESS_STATE (
+    pnodeID INTEGER,
+    newActivenessStateID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        UPDATE PNODES
+        SET PNODE_STATUS_ID = newActivenessStateID
+        WHERE PNODES.PNODE_ID = pnodeID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_PNODES_ATTENTIONLED_STATE (
+    pnodeID INTEGER,
+    newLEDStateID VARCHAR(5),
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        UPDATE PNODES
+        SET PANODE_ATTENTION_LED_STATE = newLEDStateID
+        WHERE PNODES.PNODE_ID = pnodeID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_PNODE_NICS_INFO (
+    _PNODE_NIC_ID INTEGER,
+    _PNODE_NIC_MAC_ADDRESS VARCHAR(20),
+    _PNODE_NIC_IP_ADDRESS VARCHAR(20),
+    _PNODE_NIC_IP_ADDRESS_TYPE VARCHAR(10),
+    _PNODE_NIC_SUBNET_MASK VARCHAR(20),
+    _PNODE_NIC_DEFAULT_GATEWAY VARCHAR(20),
+    _PNODE_NIC_HOSTNAME VARCHAR(255),
+    _PNODE_NIC_DOMAIN_NAME VARCHAR(255),
+    _PNODE_NIC_FIRST_DNS_IP_ADDRESS VARCHAR(255),
+    _PNODE_NIC_SECOND_DNS_IP_ADDRESS VARCHAR(255),
+    _PNODE_NIC_THIRD_DNS_IP_ADDRESS VARCHAR(255),
+    _PNODE_NIC_TYPE VARCHAR(20),
+    _PNODE_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        UPDATE PNODES_NIC_INFO
+        SET PNODE_NIC_MAC_ADDRESS                  = _pnode_nic_mac_address,
+            PNODE_NIC_IP_ADDRESS                   = _pnode_nic_ip_address,
+            PNODE_NIC_IP_ADDRESS_TYPE              = _pnode_nic_ip_address_type,
+            PNODE_NIC_SUBNETMASK                   = _pnode_nic_subnet_mask,
+            PNODE_NIC_DEFAULT_GATEWAY              = _pnode_nic_default_gateway,
+            PNODE_NIC_HOSTNAME                     = _pnode_nic_hostname,
+            PNODE_NIC_DOMAIN_NAME                  = _pnode_nic_domain_name,
+            PNODE_NIC_FIRST_DNS_SERVER_IP_ADDRESS  = _pnode_nic_first_dns_ip_address,
+            PNODE_NIC_SECOND_DNS_SERVER_IP_ADDRESS = _pnode_nic_second_dns_ip_address,
+            PNODE_NIC_THIRD_DNS_SERVER_IP_ADDRESS  = _pnode_nic_third_dns_ip_address,
+            PNODE_NIC_TYPE                         = _pnode_nic_type,
+            PNODE_NICE_TARGET_PNODE_ID             = _pnode_id
+        WHERE PNODE_NIC_ID = _pnode_nic_id;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_PNODE_ETH_ACCESS_POLICY (
+    _ACCESS_POLICY_PNODE_ID INTEGER,
+    _ACCESS_POLICY_IP_INDEX INTEGER,
+    _ACCESS_POLICY_IP_ADDRESS VARCHAR(20),
+    _ACCESS_POLICY_TYPE INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        INSERT INTO PNODES_ETH_ACCESS_POLICIES (
+            ACCESS_POLICY_PNODE_ID,
+            ACCESS_POLICY_IP_INDEX,
+            ACCESS_POLICY_IP_ADDRESS,
+            ACCESS_POLICY_TYPE
+        )
+        VALUES (_ACCESS_POLICY_PNODE_ID,
+                _ACCESS_POLICY_IP_INDEX,
+                _ACCESS_POLICY_IP_ADDRESS,
+                _ACCESS_POLICY_TYPE);
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_UPDATE_PNODE_ETH_ACCESS_POLICIES (
+    _ACCESS_POLICY_IP_INDEX_ID INTEGER,
+    _ACCESS_POLICY_IP_ADDRESS VARCHAR(20),
+    _ACCESS_POLICY_TYPE INTEGER,
+    _ACCESS_POLICY_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        UPDATE PNODES_ETH_ACCESS_POLICIES
+        SET ACCESS_POLICY_IP_INDEX   = _ACCESS_POLICY_IP_INDEX_ID,
+            ACCESS_POLICY_IP_ADDRESS = _ACCESS_POLICY_IP_ADDRESS,
+            ACCESS_POLICY_TYPE       = _ACCESS_POLICY_TYPE
+        WHERE ACCESS_POLICY_ID = _ACCESS_POLICY_ID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_DELETE_PNODE_ETH_ACCESS_POLICY (
+    _ACCESS_POLICY_IP_INDEX INTEGER,
+    _ACCESS_POLICY_TYPE INTEGER,
+    _ACCESS_POLICY_PNODE_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        DELETE
+        FROM PNODES_ETH_ACCESS_POLICIES
+        WHERE PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_IP_INDEX = _ACCESS_POLICY_IP_INDEX
+          AND PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_TYPE = _ACCESS_POLICY_TYPE
+          AND PNODES_ETH_ACCESS_POLICIES.ACCESS_POLICY_PNODE_ID = _ACCESS_POLICY_PNODE_ID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_PNODE_SINGLE_OPERATION (
+    _operationCatName VARCHAR(50),
+    _operationCompletionStatus VARCHAR(20),
+    _operationSourceUserName VARCHAR,
+    _operationSourcePNodeID INTEGER,
+    _operationAction VARCHAR(50),
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        WITH operationCatID_CTE AS (
+            SELECT OPERATION_CAT_ID AS CAT_ID
+            FROM PNODE_OPERATION_CATEGORIES
+            WHERE OPERATION_CAT_NAME = _operationCatName
+        ),
+        operationCompletionStatusID_CTE AS (
+            SELECT PNODE_LOGIN_STATUS_ID AS STATUS_ID
+            FROM PNODE_LOGIN_STATUS
+            WHERE PNODE_LOGIN_STATUS_NAME = _operationCompletionStatus),
+        userID_CTE AS (
+            SELECT USER_ID AS USERID
+            FROM USERS
+            WHERE (USER_FIRST_NAME || ' ' || USER_LAST_NAME) = _operationSourceUserName
+        )
+        INSERT INTO PNODE_OPERATIONS (
+            OPERATION_CAT_ID,
+            OPERATION_SOURCE_PNODE_ID,
+            OPERATION_BATCH_OPERATION_ID,
+            OPERATION_ACTION,
+            OPERATION_COMPLETION_STATUS_ID,
+            OPERATION_DATETIME,
+            OPERATION_SOURCE_USER_ID
+        )
+        VALUES (
+           (
+                SELECT operationCatID_CTE.CAT_ID
+                FROM operationCatID_CTE
+            ),
+            _operationSourcePNodeID,
+            NULL,
+            _operationAction,
+            (
+                SELECT operationCompletionStatusID_CTE.STATUS_ID
+                FROM operationCompletionStatusID_CTE
+            ),
+           NOW(),
+            (
+                SELECT userID_CTE.USERID
+                FROM userID_CTE
+           )
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_PNODE_EDIT_README (
+    pnodeID INTEGER,
+    newReadmeText TEXT,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        UPDATE PNODES
+        SET PNODE_README_TEXT = newReadmeText
+        WHERE PNODE_ID = pnodeID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_PNODE_EDIT_DATETIME (
+    _PNODE_ID INTEGER,
+    _TEMP_DATE VARCHAR,
+    _TEMP_TIME VARCHAR,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        WITH CURRENT_DATETIME_CTE AS (
+            SELECT PNODES_FSP_INFO.PNODE_FSP_ID,
+                   COALESCE(_TEMP_DATE, PNODES_FSP_INFO.PNODE_FSP_ASMI_LOCAL_DATETIME::VARCHAR) AS _CURRENT_DATE,
+                   COALESCE(_TEMP_TIME, PNODES_FSP_INFO.PNODE_FSP_ASMI_LOCAL_DATETIME::VARCHAR) AS _CURRENT_TIME
+            FROM PNODES_FSP_INFO
+                INNER JOIN PNODES ON PNODES.PNODE_FSP_ID = PNODES_FSP_INFO.PNODE_FSP_ID
+            WHERE PNODES.PNODE_ID = _PNODE_ID
+        )
+        UPDATE PNODES_FSP_INFO
+        SET PNODE_FSP_ASMI_LOCAL_DATETIME = (
+            (
+                SELECT CURRENT_DATETIME_CTE._CURRENT_DATE
+                FROM CURRENT_DATETIME_CTE
+                LIMIT 1
+            ) || ' ' || (
+                SELECT CURRENT_DATETIME_CTE._CURRENT_TIME
+                FROM CURRENT_DATETIME_CTE
+                LIMIT 1
+            )
+        )::TIMESTAMP
+        WHERE PNODE_FSP_ID = (
+            SELECT CURRENT_DATETIME_CTE.PNODE_FSP_ID
+            FROM CURRENT_DATETIME_CTE
+            LIMIT 1
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE TYPE ERROR_LOG_NHFRU_RECORD_LIST_TYPE AS (
+    Priority     VARCHAR(75),
+    LocationCode VARCHAR(50),
+    PartNumber   VARCHAR(50),
+    SerialNumber VARCHAR(50),
+    CCIN         VARCHAR(20)
+);
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_PNODE_ERROR_LOG (
+    ErrorLogID VARCHAR(20),
+    LogDate VARCHAR,
+    LogTime VARCHAR,
+    DriverName VARCHAR(100),
+    Subsystem VARCHAR(100),
+    RawData TEXT,
+    EventSeverity VARCHAR(255),
+    actionFlags VARCHAR(100),
+    ActionStatus VARCHAR(255),
+    ReferenceCode VARCHAR(50),
+    _PNodeID INTEGER,
+    IN ERROR_LOG_NHFRU_RECORDS ERROR_LOG_NHFRU_RECORD_LIST_TYPE[],
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE latestErrorLogDBID INTEGER;
+        NormalHardwareFRUCount INTEGER;
+        v_nested_rows INT; -- 1. Add this variable
+    BEGIN
+        INSERT INTO PNODES_FSP_ERROR_LOGS (
+           ERROR_LOG_FSP_ID,
+           ERROR_LOG_DATETIME,
+           ERROR_LOG_DRIVER_NAME,
+           ERROR_LOG_SUBSYSTEM,
+           ERROR_LOG_RAW_DATA,
+           ERROR_LOG_EVENT_SEVERITY,
+           ERROR_LOG_ACTION_FLAGS,
+           ERROR_LOG_ACTION_STATUS,
+           ERROR_LOG_REFERENCE_CODE,
+           ERROR_LOG_SOURCE_PNODE_ID
+        )
+        VALUES (
+            ErrorLogID,
+            (LogDate || ' ' || LogTime)::TIMESTAMP,
+            DriverName,
+            Subsystem,
+            RawData,
+            EventSeverity,
+            actionFlags,
+            ActionStatus,
+            ReferenceCode,
+            _PNodeID
+        );
+
+        latestErrorLogDBID := (
+            SELECT PNODES_FSP_ERROR_LOGS.ERROR_LOG_ID
+            FROM PNODES_FSP_ERROR_LOGS
+            ORDER BY ERROR_LOG_ID DESC
+            LIMIT 1
+        );
+
+        NormalHardwareFRUCount := (
+            SELECT COUNT(*)
+            FROM UNNEST(ERROR_LOG_NHFRU_RECORDS)
+        );
+
+        FOR I IN 1..NormalHardwareFRUCount LOOP
+            CALL SP_INSERT_PNODE_ERROR_LOG_NHFRU_RECORD(
+                ERROR_LOG_NHFRU_RECORDS[I],
+                latestErrorLogDBID,
+                v_nested_rows
+            );
+        END LOOP;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_PNODE_ERROR_LOG_NHFRU_RECORD (
+    ERROR_LOG_NHFRU_RECORD ERROR_LOG_NHFRU_RECORD_LIST_TYPE,
+    errorLogDBID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        INSERT INTO PNODES_FSP_ERROR_LOG_NORM_HARDWARE_FRU_RECORDS (
+            ERROR_LOG_NHFRU_PRIORITY,
+            ERROR_LOG_NHFRU_LOCATION_CODE,
+            ERROR_LOG_NHFRU_PART_NUMBER,
+            ERROR_LOG_NHFRU_SERIAL_NUMBER,
+            ERROR_LOG_NHFRU_CCIN,
+            ERROR_LOG_NHFRU_ERROR_LOG_ID
+        )
+        VALUES (
+            ERROR_LOG_NHFRU_RECORD.Priority,
+            ERROR_LOG_NHFRU_RECORD.LocationCode,
+            ERROR_LOG_NHFRU_RECORD.PartNumber,
+            ERROR_LOG_NHFRU_RECORD.SerialNumber,
+            ERROR_LOG_NHFRU_RECORD.CCIN,
+            errorLogDBID
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_INSERT_PNODES_LOGIN_AUDITS (
+    _targetPNode INTEGER,
+    login_audit_fsp_user VARCHAR(20),
+    login_audit_datetime TIMESTAMP,
+    login_audit_login_status VARCHAR(20),
+    login_audit_location VARCHAR(10),
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        WITH LOGIN_AUDIT_STATUS_CTE AS (
+            SELECT PNODE_LOGIN_STATUS_ID AS STATUS_ID
+            FROM PNODE_LOGIN_STATUS
+            WHERE PNODE_LOGIN_STATUS_NAME = login_audit_login_status
+        )
+        INSERT INTO NODES_LOGIN_AUDITS (
+            PNODE_LOGIN_AUDIT_FSP_USER,
+            PNODE_LOGIN_AUDIT_DATETIME,
+            PNODE_LOGIN_AUDIT_STATUS_ID,
+            PNODE_LOGIN_AUDIT_LOCATION,
+            PNODE_LOGIN_AUDIT_TARGET_PNODE_ID
+        )
+        VALUES (
+            login_audit_fsp_user,
+            login_audit_datetime,
+            (
+                SELECT LOGIN_AUDIT_STATUS_CTE.STATUS_ID
+                FROM LOGIN_AUDIT_STATUS_CTE
+            ),
+            login_audit_location,
+            _targetPNode
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+--endregion
