@@ -1,4 +1,5 @@
-﻿using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+﻿using POWERENV_DB_HANDLER;
+using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
 {
@@ -10,10 +11,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public PNodeFullInfo DBGetPNodeFullInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_FULL_INFO({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_FULL_INFO(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeFullInfo pnodeFullInfo = new PNodeFullInfo();
 
@@ -42,10 +48,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public PNodeFSPInfo DBGetPNodeFSPInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_FSP_INFO({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_FSP_INFO(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeFSPInfo pnodeFSPInfo = new PNodeFSPInfo();
 
@@ -76,10 +87,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public PNodeMachineInfo DBGetPNodeMachineInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_MACHINE_INFO({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_MACHINE_INFO(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeMachineInfo pnodeMachineInfo = new PNodeMachineInfo();
 
@@ -102,10 +118,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<PNodeNICInfo> DBGetPNodeNICsInfo(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_NICS_INFO({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_NICS_INFO(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodeNICInfo> pnodeNICsInfo = new List<PNodeNICInfo>();
 
@@ -139,10 +160,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<PNodeETHAccessPolicyInfo> DBGetPNodeETHAccessPolicies(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_ETH_ACCESS_POLICIES({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_ETH_ACCESS_POLICIES(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodeETHAccessPolicyInfo> pnodeETHAccessPoliciesInfo = new List<PNodeETHAccessPolicyInfo>();
 
@@ -167,11 +193,16 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<NodesLoginAudits> DBGetPNodesLoginAudits(int _targetPNode)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODES_LOGIN_AUDITS({_targetPNode}, 'CURSOR');" +
+                $"CALL SP_GET_PNODES_LOGIN_AUDITS(@targetPNode, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNode", Value = _targetPNode }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             List<NodesLoginAudits> pnodesLoginAudits = new List<NodesLoginAudits>();
 
             while (connectionInfo.reader.Read())
@@ -197,11 +228,16 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<PNodesSingleOperationHistory> DBGetPNodeOperationLogs(int _targetPNodeID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_OPERATION_LOGS({_targetPNodeID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_OPERATION_LOGS(@targetPNodeID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
             while (connectionInfo.reader.Read())
@@ -230,11 +266,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<FSPErrorLogInfo> DBGetPNodesErrorLogs(int _targetPNode)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODES_ERROR_LOGS({_targetPNode}, 'CURSOR');" +
+                $"CALL SP_GET_PNODES_ERROR_LOGS(@targetPNode, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNode", Value = _targetPNode }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<FSPErrorLogInfo> pnodeErrorLogs = new List<FSPErrorLogInfo>();
 
@@ -276,11 +316,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<LPARBasicInfo> DBGetPNodeLPARS(int PNode_ID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_LPARS({PNode_ID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_LPARS(@PNode_ID, 'CURSOR');" +
                 $"FETCH ALL FROM \"CURSOR\";" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "PNode_ID", Value = PNode_ID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<LPARBasicInfo> lparsInfo = new List<LPARBasicInfo>();
 
@@ -306,11 +350,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public LPARFullInfo DBGetPNodeMainOSLPARInfo(int PNode_ID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PNODE_MAIN_OS_LPAR_INFO({PNode_ID}, 'CURSOR');" +
+                $"CALL SP_GET_PNODE_MAIN_OS_LPAR_INFO(@PNode_ID, 'CURSOR');" +
                 $"FETCH ALL FROM \"CURSOR\";" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "PNode_ID", Value = PNode_ID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             connectionInfo.reader.Read();
 
@@ -343,107 +391,175 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public int updatePNodeActivenessState(int pnodeID, int newActivenessStateID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_UPDATE_PNODE_ACTIVENESS_STATE({pnodeID}, {newActivenessStateID}, NULL);" +
+                $"CALL SP_UPDATE_PNODE_ACTIVENESS_STATE(@pnodeID, @newActivenessStateID, NULL);" +
                 $"COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeID", Value = pnodeID },
+                new SQL_QUERY_PARAMETER { Name = "newActivenessStateID", Value = newActivenessStateID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+
             return connectionInfo.rowsAffected;
         }
 
         public int updatePNodeAttentionLEDState(int pnodeID, string newLEDState)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_UPDATE_PNODES_ATTENTIONLED_STATE({pnodeID}, '{newLEDState}', NULL);" +
+                $"CALL SP_UPDATE_PNODES_ATTENTIONLED_STATE(@pnodeID, @newLEDState, NULL);" +
                 $"COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeID", Value = pnodeID },
+                new SQL_QUERY_PARAMETER { Name = "newLEDState", Value = newLEDState }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+
             return connectionInfo.rowsAffected;
         }
 
         public int updatePNodeNICsInfo(PNodeNICInfo _newNICInfo)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_UPDATE_PNODE_NICS_INFO({ _newNICInfo.pnode_id }," +
-                $"'{ _newNICInfo.pnode_nic_mac_address }'," +
-                $"'{ _newNICInfo.pnode_nic_ip_address }'," +
-                $"'{ _newNICInfo.pnode_nic_ip_address_type }'," +
-                $"'{ _newNICInfo.pnode_nic_subnet_mask }'," +
-                $"'{ _newNICInfo.pnode_nic_default_gateway }'," +
-                $"'{ _newNICInfo.pnode_nic_hostname }'," +
-                $"'{ _newNICInfo.pnode_nic_domain_name }'," +
-                $"'{ _newNICInfo.pnode_nic_first_dns_ip_address }'," +
-                $"'{ _newNICInfo.pnode_nic_second_dns_ip_address }'," +
-                $"'{ _newNICInfo.pnode_nic_third_dns_ip_address }'," +
-                $"'{ _newNICInfo.pnode_nic_type }'," +
-                $"{ _newNICInfo.pnode_id }," +
+                $"CALL SP_UPDATE_PNODE_NICS_INFO(@pnode_id," +
+                $"@pnode_nic_mac_address," +
+                $"@pnode_nic_ip_address," +
+                $"@pnode_nic_ip_address_type," +
+                $"@pnode_nic_subnet_mask," +
+                $"@pnode_nic_default_gateway," +
+                $"@pnode_nic_hostname," +
+                $"@pnode_nic_domain_name," +
+                $"@pnode_nic_first_dns_ip_address," +
+                $"@pnode_nic_second_dns_ip_address," +
+                $"@pnode_nic_third_dns_ip_address," +
+                $"@pnode_nic_type," +
+                $"@pnode_id," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnode_id", Value = _newNICInfo.pnode_id },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_mac_address", Value = _newNICInfo.pnode_nic_mac_address },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address", Value = _newNICInfo.pnode_nic_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address_type", Value = _newNICInfo.pnode_nic_ip_address_type },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_subnet_mask", Value = _newNICInfo.pnode_nic_subnet_mask },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_default_gateway", Value = _newNICInfo.pnode_nic_default_gateway },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_hostname", Value = _newNICInfo.pnode_nic_hostname },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_domain_name", Value = _newNICInfo.pnode_nic_domain_name },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_first_dns_ip_address", Value = _newNICInfo.pnode_nic_first_dns_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_second_dns_ip_address", Value = _newNICInfo.pnode_nic_second_dns_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_third_dns_ip_address", Value = _newNICInfo.pnode_nic_third_dns_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_type", Value = _newNICInfo.pnode_nic_type }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
         public int insertPNodeETHAccessPolicy(PNodeETHAccessPolicyInfo newETHAccessPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_INSERT_PNODE_ETH_ACCESS_POLICY({newETHAccessPolicy.access_policy_pnode_id}," +
-                $"{newETHAccessPolicy.access_policy_index_id}," +
-                $"'{newETHAccessPolicy.access_policy_ip_address}'," +
-                $"{int.Parse(newETHAccessPolicy.access_policy_type)}," +
+                $"CALL SP_INSERT_PNODE_ETH_ACCESS_POLICY(@access_policy_pnode_id," +
+                $"@access_policy_index_id," +
+                $"@access_policy_ip_address," +
+                $"@access_policy_type," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "access_policy_pnode_id", Value = newETHAccessPolicy.access_policy_pnode_id },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_index_id", Value = newETHAccessPolicy.access_policy_index_id },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_ip_address", Value = newETHAccessPolicy.access_policy_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_type", Value = newETHAccessPolicy.access_policy_type }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
         public int updatePNodeETHAccessPolicies(PNodeETHAccessPolicyInfo _updatedPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_UPDATE_PNODE_ETH_ACCESS_POLICIES({ _updatedPolicy.access_policy_index_id }," +
-                $"'{ _updatedPolicy.access_policy_ip_address }'," +
-                $"{ int.Parse(_updatedPolicy.access_policy_type) }," +
-                $"{ _updatedPolicy.access_policy_id }," +
+                $"CALL SP_UPDATE_PNODE_ETH_ACCESS_POLICIES(@access_policy_index_id," +
+                $"@access_policy_ip_address," +
+                $"@access_policy_type," +
+                $"@access_policy_id," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "access_policy_index_id", Value = _updatedPolicy.access_policy_index_id },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_ip_address", Value = _updatedPolicy.access_policy_ip_address },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_type", Value = int.Parse(_updatedPolicy.access_policy_type) },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_id", Value = _updatedPolicy.access_policy_id }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
         public int deletePNodeETHAccessPolicy(PNodeETHAccessPolicyInfo ETHAccessPolicy)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_DELETE_PNODE_ETH_ACCESS_POLICY({ETHAccessPolicy.access_policy_index_id}," +
-                $"{ETHAccessPolicy.access_policy_type}," +
-                $"{ETHAccessPolicy.access_policy_pnode_id}," +
+                $"CALL SP_DELETE_PNODE_ETH_ACCESS_POLICY(@access_policy_index_id," +
+                $"@access_policy_type," +
+                $"@access_policy_pnode_id," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "access_policy_index_id", Value = ETHAccessPolicy.access_policy_index_id },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_type", Value = ETHAccessPolicy.access_policy_type },
+                new SQL_QUERY_PARAMETER { Name = "access_policy_pnode_id", Value = ETHAccessPolicy.access_policy_pnode_id }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
         public int DBInsertPNodeSingleOperation(PNodesSingleOperationHistory OperationData)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_INSERT_PNODE_SINGLE_OPERATION('{OperationData.operationCatName}'," +
-                $"'{OperationData.operationCompletionStatus}'," +
-                $"'{OperationData.operationSourceUserName}'," +
-                $"{OperationData.operationSourcePNodeID}," +
-                $"'{OperationData.operationAction}'," +
+                $"CALL SP_INSERT_PNODE_SINGLE_OPERATION(@operationCatName," +
+                $"@operationCompletionStatus," +
+                $"@operationSourceUserName," +
+                $"@operationSourcePNodeID," +
+                $"@operationAction," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "operationCatName", Value = OperationData.operationCatName },
+                new SQL_QUERY_PARAMETER { Name = "operationCompletionStatus", Value = OperationData.operationCompletionStatus },
+                new SQL_QUERY_PARAMETER { Name = "operationSourceUserName", Value = OperationData.operationSourceUserName },
+                new SQL_QUERY_PARAMETER { Name = "operationSourcePNodeID", Value = OperationData.operationSourcePNodeID },
+                new SQL_QUERY_PARAMETER { Name = "operationAction", Value = OperationData.operationAction }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
         public int DBPNodeEditReadme(int pnodeID, string newReadmeText)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_PNODE_EDIT_README({pnodeID}, '{newReadmeText}', NULL);" +
+                $"CALL SP_PNODE_EDIT_README(@pnodeID, @newReadmeText, NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeID", Value = pnodeID },
+                new SQL_QUERY_PARAMETER { Name = "newReadmeText", Value = newReadmeText }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
             return connectionInfo.rowsAffected;
         }
 
@@ -455,10 +571,16 @@ namespace POWERENV_PGSQL_DB_HANDLER
             if (_date != null) tempDATE = $"{_date.Split("-")[2]}-{_date.Split("-")[0]}-{_date.Split("-")[1]}";
 
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_PNODE_EDIT_DATETIME({_pnodeID}, '{tempDATE}', '{tempTIME}', NULL);" +
+                $"CALL SP_PNODE_EDIT_DATETIME(@pnodeID, @date, @time, NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeID", Value = _pnodeID },
+                new SQL_QUERY_PARAMETER { Name = "date", Value = tempDATE },
+                new SQL_QUERY_PARAMETER { Name = "time", Value = tempTIME }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 
@@ -473,26 +595,39 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             actionFlags += $"{_currErrorLog.ActionFlags[_currErrorLog.ActionFlags.Count - 1]}";
 
-            _currErrorLog.RawData = _currErrorLog.RawData.Replace("'", "''");
-
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODE_ERROR_LOG(" +
-                $"'{_currErrorLog.ErrorLogID}'," +
-                $"'{_currErrorLog.LogDate}'," +
-                $"'{_currErrorLog.LogTime}'," +
-                $"'{_currErrorLog.DriverName}'," +
-                $"'{_currErrorLog.Subsystem}'," +
-                $"'{_currErrorLog.RawData}'," +
-                $"'{_currErrorLog.EventSeverity}'," +
-                $"'{_currErrorLog.ActionFlags}'," +
-                $"'{_currErrorLog.ActionStatus}'," +
-                $"'{_currErrorLog.ReferenceCode}'," +
-                $"{_PNodeID}," +
-                $"{_currErrorLog.NormalHardwareFRU}" +
+                $"@ErrorLogID," +
+                $"@LogDate," +
+                $"@LogTime," +
+                $"@DriverName," +
+                $"@Subsystem," +
+                $"@RawData," +
+                $"@EventSeverity," +
+                $"@ActionFlags," +
+                $"@ActionStatus," +
+                $"@ReferenceCode," +
+                $"@PNodeID," +
+                $"@NormalHardwareFRU," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "ErrorLogID", Value = _currErrorLog.ErrorLogID },
+                new SQL_QUERY_PARAMETER { Name = "LogDate", Value = _currErrorLog.LogDate },
+                new SQL_QUERY_PARAMETER { Name = "LogTime", Value = _currErrorLog.LogTime },
+                new SQL_QUERY_PARAMETER { Name = "DriverName", Value = _currErrorLog.DriverName },
+                new SQL_QUERY_PARAMETER { Name = "Subsystem", Value = _currErrorLog.Subsystem },
+                new SQL_QUERY_PARAMETER { Name = "RawData", Value = _currErrorLog.RawData },
+                new SQL_QUERY_PARAMETER { Name = "EventSeverity", Value = _currErrorLog.EventSeverity },
+                new SQL_QUERY_PARAMETER { Name = "ActionFlags", Value = actionFlags },
+                new SQL_QUERY_PARAMETER { Name = "ActionStatus", Value = _currErrorLog.ActionStatus },
+                new SQL_QUERY_PARAMETER { Name = "ReferenceCode", Value = _currErrorLog.ReferenceCode },
+                new SQL_QUERY_PARAMETER { Name = "PNodeID", Value = _PNodeID },
+                new SQL_QUERY_PARAMETER { Name = "NormalHardwareFRU", Value = _currErrorLog.NormalHardwareFRU }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -500,10 +635,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         private int DBInsertPNodeErrorLogNHFRURecord(PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogFRUInfo NHFRURecord, int errorLogDBID)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_INSERT_PNODE_ERROR_LOG_NHFRU_RECORD({NHFRURecord}, {errorLogDBID}, NULL);" +
+                $"CALL SP_INSERT_PNODE_ERROR_LOG_NHFRU_RECORD(@NHFRURecord, @errorLogDBID, NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "NHFRURecord", Value = NHFRURecord },
+                new SQL_QUERY_PARAMETER { Name = "errorLogDBID", Value = errorLogDBID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 
@@ -511,15 +651,23 @@ namespace POWERENV_PGSQL_DB_HANDLER
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
                 $"CALL SP_INSERT_PNODES_LOGIN_AUDITS(" +
-                $"{_targetPNode}," +
-                $"'{loginAudit.login_audit_fsp_user}'," +
-                $"'{loginAudit.login_audit_datetime}'," +
-                $"'{loginAudit.login_audit_login_status}'," +
-                $"'{loginAudit.login_audit_location}'," +
+                $"@targetPNode," +
+                $"@login_audit_fsp_user," +
+                $"@login_audit_datetime," +
+                $"@login_audit_login_status," +
+                $"@login_audit_location," +
                 $"NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPNode", Value = _targetPNode },
+                new SQL_QUERY_PARAMETER { Name = "login_audit_fsp_user", Value = loginAudit.login_audit_fsp_user },
+                new SQL_QUERY_PARAMETER { Name = "login_audit_datetime", Value = loginAudit.login_audit_datetime },
+                new SQL_QUERY_PARAMETER { Name = "login_audit_login_status", Value = loginAudit.login_audit_login_status },
+                new SQL_QUERY_PARAMETER { Name = "login_audit_location", Value = loginAudit.login_audit_location }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 

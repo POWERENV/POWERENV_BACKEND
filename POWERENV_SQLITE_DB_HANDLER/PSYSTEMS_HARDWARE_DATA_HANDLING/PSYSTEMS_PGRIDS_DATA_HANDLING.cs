@@ -1,4 +1,5 @@
-﻿using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+﻿using POWERENV_DB_HANDLER;
+using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
 {
@@ -9,10 +10,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public PGridFullInfo DBGetPGridFullInfo(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_FULL_INFO({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_FULL_INFO(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PGridFullInfo pgridFullInfo = new PGridFullInfo { };
 
@@ -40,10 +46,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<AccessPolicyInfo> DBGetPGAccessPolicies(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_ACCESSPOLICIES({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_ACCESSPOLICIES(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AccessPolicyInfo> accessPolicies = new List<AccessPolicyInfo>();
 
@@ -71,10 +82,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<AccessAuditInfo> DBGetPGAccessAudits(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_ACCESSAUDITS({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_ACCESSAUDITS(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AccessAuditInfo> pgridAccessAudits = new List<AccessAuditInfo>();
 
@@ -99,10 +115,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<NodesLoginAudits> DBGetPGPNLoginAudits(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_PNODES_LOGINAUDITS({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_PNODES_LOGINAUDITS(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
@@ -130,10 +151,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<FSPErrorLogInfo> DBGetPGErrorLogs(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_ERROR_LOGS({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_ERROR_LOGS(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
@@ -176,10 +202,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<AttentionLEDPNodesInfo> DBGetAttentionLEDPNodes(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRID_ATTENTIONLED_PNODES({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRID_ATTENTIONLED_PNODES(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
@@ -202,11 +233,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<PPoolsList> DBGetPGPPoolsList(int _targetPgridID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PGRIDS_PPOOLS_LIST({_targetPgridID}, 'CURSOR');" +
+                $"CALL SP_GET_PGRIDS_PPOOLS_LIST(@targetPgridID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PPoolsList> ppoolsInfoList = new List<PPoolsList>();
 

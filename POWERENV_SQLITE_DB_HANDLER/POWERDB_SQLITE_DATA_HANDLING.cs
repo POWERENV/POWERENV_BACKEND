@@ -47,14 +47,21 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// </summary>
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
+        /// <param name="parameters"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor)
+        public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor)
         {
             SQLITE_DB_CONNECTION_INFO connectionInfo = new SQLITE_DB_CONNECTION_INFO();
             connectionInfo.conn = new SqliteConnection(_connectionString);
             connectionInfo.conn.Open();
 
             var cmd = new SqliteCommand(_sqlCommandText, connectionInfo.conn);
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+            }
+
             connectionInfo.reader = cmd.ExecuteReader();
 
             return connectionInfo;
@@ -68,7 +75,19 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
         static internal SQLITE_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
         {
-            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, hasCursor);
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), hasCursor);
+        }
+
+        /// <summary>
+        /// Static reference to intReadQueryFromDB database reading method, with query parameters.
+        /// </summary>
+        /// <param name="_connectionString"></param>
+        /// <param name="_sqlCommandText"></p
+        /// <param name="parameters"></param>
+        /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
+        static internal SQLITE_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor = false)
+        {
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, parameters, hasCursor);
         }
 
         /// <summary>
@@ -76,14 +95,21 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// </summary>
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
+        /// <param name="parameters"></param>
         /// <returns>ICONNECTION_INFO packet object.</returns>
-        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure)
+        public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure)
         {
             SQLITE_DB_CONNECTION_INFO connectionInfo = new SQLITE_DB_CONNECTION_INFO();
             connectionInfo.conn = new SqliteConnection(_connectionString);
             connectionInfo.conn.Open();
 
             var cmd = new SqliteCommand(_sqlCommandText, connectionInfo.conn);
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+            }
+
             connectionInfo.rowsAffected = cmd.ExecuteNonQuery();
 
             return connectionInfo;
@@ -97,7 +123,18 @@ namespace POWERDB_SQLITE_DATA_HANDLING
         /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
         static internal SQLITE_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = false)
         {
-            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, isStoredProcedure);
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), isStoredProcedure);
+        }
+
+        /// <summary>
+        /// Static reference to intWriteDataOnDB database writing method, with query parameters.
+        /// </summary>
+        /// <param name="_connectionString"></param>
+        /// <param name="_sqlCommandText"></param>
+        /// <returns>SQLITE_DB_CONNECTION_INFO packet object.</returns>
+        static internal SQLITE_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure = false)
+        {
+            return (SQLITE_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, parameters, isStoredProcedure);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+﻿using POWERENV_DB_HANDLER;
+using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
 {
@@ -11,11 +12,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<PNodesBasicInfo> DBGetPGPPoolPNodesList(int _targetPPoolID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL sp_get_ppool_pnodes_list({_targetPPoolID}, 'CURSOR');" +
+                $"CALL sp_get_ppool_pnodes_list(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodesBasicInfo> pnodesInfoList = new List<PNodesBasicInfo>();
 
@@ -39,10 +44,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public PPoolFullInfo DBGetPPoolFullInfo(int _targetPPoolID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_FULL_INFO({_targetPPoolID}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_FULL_INFO(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PPoolFullInfo pgridFullInfo = new PPoolFullInfo();
 
@@ -70,10 +80,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<NodesLoginAudits> DBGetPPoolsLoginAudits(int _targetPpool)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_LOGIN_AUDITS({_targetPpool}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_LOGIN_AUDITS(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
@@ -101,10 +116,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<AttentionLEDPNodesInfo> DBGetPPoolAttentionLEDPNodes(int _targetPpool)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_ATTENTIONLED_PNODES({_targetPpool}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_ATTENTIONLED_PNODES(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
@@ -127,11 +147,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public List<FSPErrorLogInfo> DBGetPPoolsErrorLogs(int _targetPpool)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_ERROR_LOGS({_targetPpool}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_ERROR_LOGS(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
 
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
             while (connectionInfo.reader.Read())
@@ -173,11 +197,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         private List<PNodesSingleOperationHistory> DBGetPPoolPNodesSingleOperationLogs(int _targetPPoolID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_PNODES_SINGLE_OPERATION_LOGS({_targetPPoolID}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_PNODES_SINGLE_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
@@ -207,11 +235,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         private List<PPoolsBatchOperationHistory> DBGetPPoolBatchOperationLogs(int _targetPPoolID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_BATCH_OPERATION_LOGS({_targetPPoolID}, 'CURSOR');" +
+                $"CALL SP_GET_PPOOL_BATCH_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PPoolsBatchOperationHistory> ppoolBatchOperationHistory = new List<PPoolsBatchOperationHistory>();
 
@@ -254,10 +286,15 @@ namespace POWERENV_PGSQL_DB_HANDLER
         public int DBPPoolEditReadme(int ppoolID, string newReadmeText)
         {
             string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_PPOOL_EDIT_README({ppoolID}, '{newReadmeText}', NULL);" +
+                $"CALL SP_PPOOL_EDIT_README(@ppoolID, @newReadmeText, NULL);" +
                 $"COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "ppoolID", Value = ppoolID },
+                new SQL_QUERY_PARAMETER { Name = "newReadmeText", Value = newReadmeText }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
             return connectionInfo.rowsAffected;
         }
 
