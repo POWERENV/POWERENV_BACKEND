@@ -27,7 +27,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.PowerManagementLib.DEVICE_POWERON();
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
@@ -67,7 +67,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 updateUserCredentials(_systemID);
                 POWERENV.PowerManagementLib.DEVICE_POWEROFF();
@@ -108,7 +108,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 updateUserCredentials(_systemID);
                 POWERENV.PowerManagementLib.DEVICE_REBOOT();
@@ -149,7 +149,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.PowerManagementLib.DEVICE_ATENTION_LED_OFF();
                 Thread.Sleep(500); // Wait for 0.5 seconds to ensure the command is processed

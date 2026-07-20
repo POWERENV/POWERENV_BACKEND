@@ -36,7 +36,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
                     pnode_attention_led_state = connectionInfo.reader.GetString(10),
                     pnode_readme_text = connectionInfo.reader.GetString(11),
                     pnodeActivenessState = connectionInfo.reader.GetString(12) == "ACTIVE" ? true : false,
-                    pnodeSerialCOMPortId = connectionInfo.reader.GetInt32(13)
+                    pnodeSerialCOMPortId = connectionInfo.reader.GetString(13)
                 };
             }
 

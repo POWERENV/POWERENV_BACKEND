@@ -19,14 +19,14 @@ namespace POWERENV_BACKEND_API.Controllers
             DB_HANDLER = new POWERDB_PGSQL_DATA_HANDLING(AppContext.BaseDirectory);
         }
 
-        //Change from GET to POST (to increase security)
         [HttpPost("{_systemID}/changePassword")]
         public IActionResult ASMIChangePassword([FromRoute] int _systemID, [FromBody] string _newPassword)
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.AuthManagementLib.ASMIChangePassword(_newPassword);
                 Thread.Sleep(3000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -49,7 +49,7 @@ namespace POWERENV_BACKEND_API.Controllers
             List<AUTH_MGMT.STRUCT_LOGIN_AUDIT_INFO> authLogs = new List<AUTH_MGMT.STRUCT_LOGIN_AUDIT_INFO>();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
 
                 switch (_loginAuditsType)

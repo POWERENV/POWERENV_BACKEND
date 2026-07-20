@@ -206,7 +206,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
             public string pnode_attention_led_state { get; set; }
             public string pnode_readme_text { get; set; }
             public bool pnodeActivenessState { get; set; }
-            public int pnodeSerialCOMPortId { get; set; }
+            public string pnodeSerialCOMPortId { get; set; }
         }
 
         public record LPARBasicInfo

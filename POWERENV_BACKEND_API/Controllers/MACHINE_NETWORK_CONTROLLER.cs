@@ -29,7 +29,8 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 STRUCT_NETWORK_INTERFACE networkInfo = POWERENV.NetworkMgmt.GetNetworkInterfaceConfigs(_eth_index);
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -52,7 +53,8 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.NetworkMgmt.ResetNetworkConfigs();
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -74,7 +76,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.NetworkMgmt.EditNetworkInterfaceConfigs(networkInterfaceConfigChangeData.eth_index, networkInterfaceConfigChangeData.changedProperties, networkInterfaceConfigChangeData.newValues, networkInterfaceConfigChangeData.IPAddressType);
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
@@ -139,7 +141,8 @@ namespace POWERENV_BACKEND_API.Controllers
             List<string> AllowedIPs = new List<string>();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 AllowedIPs = POWERENV.NetworkMgmt.GetAllowedIPAddresses();
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -163,7 +166,8 @@ namespace POWERENV_BACKEND_API.Controllers
             List<string> DeniedIPs = new List<string>();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 DeniedIPs = POWERENV.NetworkMgmt.GetDeniedIPAddresses();
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -187,7 +191,7 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 // Change Data on the Machine
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.NetworkMgmt.EditAllowedIPAddresses(IPAddressesChangeData.indexes, IPAddressesChangeData.IPAddresses);
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
@@ -244,7 +248,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.NetworkMgmt.EditDeniedIPAddresses(IPAddressesChangeData.indexes, IPAddressesChangeData.IPAddresses);
                 Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed

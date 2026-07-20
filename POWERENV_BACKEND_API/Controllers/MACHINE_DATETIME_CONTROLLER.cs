@@ -27,7 +27,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.DatetimeMgmt.DEVICE_SET_DATE(POWERENV.DatetimeMgmt.changeDateStringFormat(_newDate, new int[] { 2, 1, 0 }));
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
@@ -61,7 +61,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.DatetimeMgmt.DEVICE_SET_TIME(_newTime);
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed

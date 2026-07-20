@@ -23,17 +23,15 @@ namespace POWER_ENV
         public static SerialPort SerialCOMPort { get => serialCOMPort; }
         public static FSP_MGMT FspMgmt { get => fspMgmt; }
 
-        public void Main(int comPortIndex)
+        public void Main(string comPort)
         {
-            //Console.WriteLine(System.Runtime.InteropServices.RuntimeInformation.OSDescription);
-
             powerManagementLib = new POWER_MGMT();
             authManagementLib = new AUTH_MGMT();
             datetimeMgmt = new DATETIME_MGMT();
             networkMgmt = new NETWORK_MGMT();
             fspMgmt = new FSP_MGMT();
 
-            InitializeCOMPort(comPortIndex);
+            InitializeCOMPort(comPort);
         }
 
         public void CloseSerialConnection()
@@ -192,9 +190,9 @@ namespace POWER_ENV
             while (command != "exit");
         }
 
-        static private void InitializeCOMPort(int comPortIndex)
+        static private void InitializeCOMPort(string comPortIndex)
         {
-            serialCOMPort = new SerialPort($"COM{comPortIndex}", 19200, Parity.None, 8, StopBits.One);
+            serialCOMPort = new SerialPort(comPortIndex, 19200, Parity.None, 8, StopBits.One);
             serialCOMPort.Handshake = Handshake.None;
             serialCOMPort.NewLine = "\n";
             serialCOMPort.DataReceived += SerialDataReceived;

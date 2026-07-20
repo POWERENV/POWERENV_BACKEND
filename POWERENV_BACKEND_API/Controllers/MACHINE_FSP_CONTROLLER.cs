@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWER_ENV;
 using POWERENV_PGSQL_DB_HANDLER;
-using System.Collections.Generic;
 using static POWER_ENV.FSP_MGMT;
 using static POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
@@ -29,7 +28,8 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 POWERENV.FspMgmt.FSP_RESET();
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -52,7 +52,7 @@ namespace POWERENV_BACKEND_API.Controllers
             List<POWER_ENV.FSP_MGMT.STRUCT_FSP_ERROR_LOG_INFO> errorLogInfo = new List<FSP_MGMT.STRUCT_FSP_ERROR_LOG_INFO>();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 errorLogInfo = POWERENV.FspMgmt.getFSPErrorLogs();
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
@@ -127,7 +127,8 @@ namespace POWERENV_BACKEND_API.Controllers
             STRUCT_MACHINE_INFO systemInfo = new STRUCT_MACHINE_INFO();
             try
             {
-                POWERENVEngine.Main(_systemID);
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                POWERENVEngine.Main(pnodeCOMPortID);
                 systemInfo = POWERENV.FspMgmt.GetMachineInfo();
                 Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
                 POWERENVEngine.CloseSerialConnection();
@@ -150,7 +151,7 @@ namespace POWERENV_BACKEND_API.Controllers
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
             try
             {
-                int pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
+                string pnodeCOMPortID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnodeSerialCOMPortId;
                 POWERENVEngine.Main(pnodeCOMPortID);
                 POWER_ENV.POWERENV.SendCommand("\n", 500);
                 string receivedData = POWER_ENV.POWERENV.GetReceivedData();
