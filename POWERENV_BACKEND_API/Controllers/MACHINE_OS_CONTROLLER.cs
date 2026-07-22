@@ -44,7 +44,12 @@ namespace POWERENV_BACKEND_API.Controllers
                     if (!currDBQueueList.Contains(newToken)) canProceed = true;
                 } while (!canProceed);
 
-                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
+                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo {
+                    session_id = newToken,
+                    WSSListenerConnectionID = "-1",
+                    sessionTargetLPARInfo = targetLPARID,
+                    pendingCommand = ""
+                };
 
                 updateUserCredentials(targetLPARID.lpar_target_pnode_id);
 

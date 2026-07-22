@@ -1,6 +1,8 @@
-using StackExchange.Redis;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using POWER_ENV.GLOBAL.NETWORK;
+using POWERENV_BACKEND_API.Redis;
 using POWERENV_BACKEND_API.SignalR;
+using StackExchange.Redis;
 
 namespace POWERENV_BACKEND_API
 {
@@ -61,11 +63,25 @@ namespace POWERENV_BACKEND_API
 
             builder.Services.AddControllers();
 
-            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            /*builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
             {
                 var config = sp.GetRequiredService<IConfiguration>();
                 return ConnectionMultiplexer.Connect(config.GetConnectionString("RedisCache"));
-            });
+            });*/
+
+            builder.AddRedisDistributedCache("RedisCache");
+
+            // 3. Configure Security perimeter policies
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = ".PowerEnvAuthToken";
+                    options.Cookie.HttpOnly = true;               // Blocks XSS read exploits
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Demands HTTPS
+                    options.Cookie.SameSite = SameSiteMode.Strict;   // Defends against CSRF forged state attacks
+                    options.ExpireTimeSpan = TimeSpan.FromHours(2);
+                    options.SessionStore = new RedisAuthCookieTicketStore(builder.Services.BuildServiceProvider());
+                });
 
             builder.Services.AddSignalR();
 
@@ -89,7 +105,7 @@ namespace POWERENV_BACKEND_API
             }
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

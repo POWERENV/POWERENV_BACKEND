@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -53,11 +54,21 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PGridBasicInfo> pgridsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGrids();
+            int userId;
 
-            response.operationStatus = true;
-            response.statusMessage = "PGrid Dashboard data successfully received!";
-            response.packetData = pgridsInfoList;
+            if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId))
+            {
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.PGridBasicInfo> pgridsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGrids(userId);
+
+                response.operationStatus = true;
+                response.statusMessage = "PGrid Dashboard data successfully received!";
+                response.packetData = pgridsInfoList;
+            }
+            else
+            {
+                response.operationStatus = false;
+                response.statusMessage = "Can' parse userID to integer!!!";
+            }
 
             return Ok(response);
         }

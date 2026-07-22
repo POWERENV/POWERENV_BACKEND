@@ -1,4 +1,5 @@
 CREATE OR REPLACE PROCEDURE SP_GET_PGRIDS_LIST (
+    _USER_ID INTEGER,
     INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
 )
 LANGUAGE plpgsql
@@ -7,26 +8,43 @@ AS $$
 BEGIN
     OPEN result_set FOR
         WITH PPOOL_COUNT_CTE AS (
-                SELECT PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID,
-                       COUNT(PPOOL_ID) AS PPOOL_COUNT
-                FROM PPOOLS
-                GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID
-            ),
-            PNODE_COUNT_CTE AS (
-                SELECT PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID,
-                       COUNT(PNODES.PNODE_ID) AS PNODE_COUNT
-                FROM PNODES
-                    RIGHT JOIN PPOOLS ON PPOOLS.PPOOL_ID = PNODES.PNODE_ASSOCIATED_PPOOL_ID
-                GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID
-                )
-        SELECT PGRIDS.PGRID_ID,
-               PGRIDS.PGRID_NAME,
-               COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
-               COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT
-        FROM PGRIDS
-            INNER JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
-            INNER JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
-        ORDER BY pgrids.PGRID_ID;
+            SELECT PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID,
+                   COUNT(PPOOL_ID) AS PPOOL_COUNT
+            FROM PPOOLS
+            GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID
+        ),
+        PNODE_COUNT_CTE AS (
+            SELECT PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID,
+                   COUNT(PNODES.PNODE_ID) AS PNODE_COUNT
+            FROM PNODES
+                RIGHT JOIN PPOOLS ON PPOOLS.PPOOL_ID = PNODES.PNODE_ASSOCIATED_PPOOL_ID
+            GROUP BY PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID
+        )
+        (
+            (
+                SELECT PGRIDS.PGRID_ID,
+                       PGRIDS.PGRID_NAME,
+                       COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
+                       COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT
+                FROM PGRIDS
+                    LEFT JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
+                    LEFT JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
+                WHERE PGRIDS.pgrid_owner_id = _USER_ID
+                ORDER BY pgrids.PGRID_ID
+            )
+            UNION
+            (
+                SELECT access_policy_pgrid_id,
+                       PGRIDS.pgrid_name,
+                       COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
+                       COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT
+                FROM pgrid_access_policies
+                    LEFT JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = pgrid_access_policies.access_policy_pgrid_id
+                    LEFT JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = pgrid_access_policies.access_policy_pgrid_id
+                    INNER JOIN PGRIDS ON pgrid_id = pgrid_access_policies.access_policy_pgrid_id
+                WHERE access_policy_target_user_id = _USER_ID
+            )
+        );
     END;
 $$;
 

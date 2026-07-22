@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using POWERENV_DB_HANDLER;
 using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
@@ -272,14 +273,19 @@ namespace POWERENV_PGSQL_DB_HANDLER
             NpgsqlDataSource dataSource = dataSourceBuilder.Build();
         }
 
-        public List<PGridBasicInfo> DBGetPGrids()
+        public List<PGridBasicInfo> DBGetPGrids(int userID)
         {
             string sqlCommandText = "BEGIN TRANSACTION;" +
-                "CALL SP_GET_PGRIDS_LIST('CURSOR');" +
+                "CALL SP_GET_PGRIDS_LIST(@userID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";" +
                 "COMMIT;";
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, true);
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PGridBasicInfo> pgridsBasicInfoList = new List<PGridBasicInfo>();
 

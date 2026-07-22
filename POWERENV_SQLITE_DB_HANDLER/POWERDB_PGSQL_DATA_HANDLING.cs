@@ -1,5 +1,6 @@
 ﻿using POWERENV_DB_HANDLER;
 using Npgsql;
+using POWERENV_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_PGSQL_DB_HANDLER
 {
@@ -20,6 +21,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
     {
         private static POWERDB_PGSQL_DATA_HANDLING autoInstance;
         private PSYSTEMS_HARDWARE_DATA_HANDLING hardwareDataHandler;
+        private USER_DATA_HANDLING userDataHandler;
 
         /// <summary>
         /// Property for the actual POWERENV data interaction methods class.
@@ -30,13 +32,23 @@ namespace POWERENV_PGSQL_DB_HANDLER
         }
 
         /// <summary>
+        /// Property for the actual POWERENV data interaction methods class.
+        /// </summary>
+        public USER_DATA_HANDLING USER_DATA_HANDLER
+        {
+            get => userDataHandler;
+            set => userDataHandler = value;
+        }
+
+        /// <summary>
         /// POWERDB_PGSQL_DATA_HANDLING class constructor
         /// </summary>
         /// <param name="dataSourceDirPath"></param>
         public POWERDB_PGSQL_DATA_HANDLING(string dataSourceDirPath, bool initializeAutoInstance = true)
         {
             HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath);
-            if(initializeAutoInstance) autoInstance = new POWERDB_PGSQL_DATA_HANDLING(dataSourceDirPath, false);
+            USER_DATA_HANDLER = new USER_DATA_HANDLING(dataSourceDirPath);
+            if (initializeAutoInstance) autoInstance = new POWERDB_PGSQL_DATA_HANDLING(dataSourceDirPath, false);
         }
 
         //###########################################################################################
