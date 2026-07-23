@@ -12,18 +12,26 @@ namespace POWERENV_DB_HANDLER.USER_DATA_HANDLING
 
         public record UserProfileInfo
         {
-            public int user_id { get; set; }
-            public string user_first_name { get; set; } = string.Empty;
-            public string user_last_name { get; set; } = string.Empty;
-            public string user_email { get; set; } = string.Empty;
-            public string user_password_hash { get; set; } = string.Empty;
-            public string user_profile_picture { get; set; } = string.Empty;
-            public string user_signup_datetime { get; set; } = string.Empty;
-            public string user_last_login_datetime { get; set; } = string.Empty;
+            public int? user_id { get; set; }
+            public string? user_first_name { get; set; } = string.Empty;
+            public string? user_last_name { get; set; } = string.Empty;
+            public string? user_email { get; set; } = string.Empty;
+            public string? user_password_hash { get; set; } = string.Empty;
+            public string? user_profile_picture { get; set; } = string.Empty;
+            public string? user_signup_datetime { get; set; } = string.Empty;
+            public string? user_last_login_datetime { get; set; } = string.Empty;
         }
 
-        public class LoginRequest
+        public record LoginRequest
         {
+            public string Email { get; set; } = string.Empty;
+            public string Password { get; set; } = string.Empty;
+        }
+
+        public record SignupRequest
+        {
+            public string FirstName { get; set; } = string.Empty;
+            public string LastName { get; set; } = string.Empty;
             public string Email { get; set; } = string.Empty;
             public string Password { get; set; } = string.Empty;
         }
@@ -74,6 +82,28 @@ namespace POWERENV_DB_HANDLER.USER_DATA_HANDLING
             connectionInfo.conn.Close();
 
             return userProfile;
+        }
+
+        public int DBCreateUser(SignupRequest newUserFormData)
+        {
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_CREATE_USER(@user_first_name," +
+                "@user_last_name," +
+                "@user_email," +
+                "@user_password_hash," +
+                "NULL);" +
+                "COMMIT;";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER { Name = "user_first_name", Value = newUserFormData.FirstName },
+                new SQL_QUERY_PARAMETER { Name = "user_last_name", Value = newUserFormData.LastName },
+                new SQL_QUERY_PARAMETER { Name = "user_email", Value = newUserFormData.Email },
+                new SQL_QUERY_PARAMETER { Name = "user_password_hash", Value = newUserFormData.Password }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            return connectionInfo.rowsAffected;
         }
     }
 }

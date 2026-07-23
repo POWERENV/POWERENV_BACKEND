@@ -25,14 +25,22 @@ namespace POWERENV_BACKEND_API.Controllers
 
             if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest("Email and Password are required.");
+                response.operationStatus = false;
+                response.statusMessage = "Bad Request: Email and Password are required.";
+                response.packetData = null;
+
+                return Ok(response);
             }
 
             var validatedUser = await ValidateUserCredentialsAsync(request.Email, request.Password);
 
             if (validatedUser == null)
             {
-                return Unauthorized("Invalid email or password.");
+                response.operationStatus = false;
+                response.statusMessage = "Unauthorized: Invalid email or password.";
+                response.packetData = null;
+
+                return Ok(response);
             }
 
             // Generate Identity ticket metadata (Claims)
@@ -40,7 +48,8 @@ namespace POWERENV_BACKEND_API.Controllers
             {
                 new Claim(ClaimTypes.NameIdentifier, validatedUser.user_id.ToString()),
                 new Claim(ClaimTypes.Name, $"{validatedUser.user_first_name} {validatedUser.user_last_name}"),
-                new Claim(ClaimTypes.Email, validatedUser.user_email)
+                new Claim(ClaimTypes.Email, validatedUser.user_email),
+                new Claim("ProfilePicturePath", validatedUser.user_profile_picture)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -57,6 +66,43 @@ namespace POWERENV_BACKEND_API.Controllers
                 username = $"{validatedUser.user_first_name} {validatedUser.user_last_name}",
                 email = validatedUser.user_email
             };
+
+            return Ok(response);
+        }
+
+        [HttpPost("signup")]
+        public async Task<IActionResult> SignUp([FromBody] SignupRequest request)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                response.operationStatus = false;
+                response.statusMessage = "Bad Request: Email and Password are required.";
+                response.packetData = null;
+
+                return Ok(response);
+            }
+
+            string passwordHash = BCrypt.Net.BCrypt.EnhancedHashPassword(request.Password);
+            int userCreationRowsAffected = DB_HANDLER.USER_DATA_HANDLER.DBCreateUser(request with { Password = passwordHash });
+
+            if (userCreationRowsAffected == 0)
+            {
+                response.operationStatus = false;
+                response.statusMessage = "Error during sign up. User database registry creation failed.";
+                response.packetData = null;
+
+                return Ok(response);
+            }
+
+            var loginResponse = await Login(new LoginRequest() { Email = request.Email, Password = request.Password });
+            response = (Program.STRUCT_REQUEST_DATA)(loginResponse as OkObjectResult).Value;
+
+            if(response.operationStatus == true)
+            {
+                response.statusMessage = "Signup successful. Session backed by Redis.";
+            }
 
             return Ok(response);
         }
@@ -85,6 +131,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 var username = User.FindFirst(ClaimTypes.Name)?.Value;
                 var email = User.FindFirst(ClaimTypes.Email)?.Value;
+                var profilePicture = User.FindFirst("ProfilePicturePath")?.Value;
 
                 response.operationStatus = true;
                 response.statusMessage = "User is authenticated.";
@@ -92,7 +139,8 @@ namespace POWERENV_BACKEND_API.Controllers
                 {
                     userId,
                     username,
-                    email
+                    email,
+                    profilePicture
                 };
             }
             else
@@ -111,6 +159,10 @@ namespace POWERENV_BACKEND_API.Controllers
             if (userProfileInfo == null)
             {
                 return null; // User not found
+            }
+            else if(userProfileInfo.user_id == -1)
+            {
+                return null; // User not found (despite having a result line returned by the validation query, all column values are null)
             }
 
             bool isPasswordValid = BCrypt.Net.BCrypt.EnhancedVerify(plainPassword, userProfileInfo.user_password_hash);
