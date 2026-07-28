@@ -531,15 +531,19 @@ namespace POWERENV_PGSQL_DB_HANDLER
                 $"@operationSourceUserName," +
                 $"@operationSourcePNodeID," +
                 $"@operationAction," +
+                $"@operationDescription," +
+                $"@operationSeverityLevelID," +
                 $"NULL);" +
                 $"COMMIT;";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
-                new SQL_QUERY_PARAMETER { Name = "operationCatName", Value = OperationData.operationCatName },
-                new SQL_QUERY_PARAMETER { Name = "operationCompletionStatus", Value = OperationData.operationCompletionStatus },
-                new SQL_QUERY_PARAMETER { Name = "operationSourceUserName", Value = OperationData.operationSourceUserName },
-                new SQL_QUERY_PARAMETER { Name = "operationSourcePNodeID", Value = OperationData.operationSourcePNodeID },
-                new SQL_QUERY_PARAMETER { Name = "operationAction", Value = OperationData.operationAction }
+                new SQL_QUERY_PARAMETER { Name = "operationCatName", Value = OperationData.operationCatName ?? "" },
+                new SQL_QUERY_PARAMETER { Name = "operationCompletionStatus", Value = OperationData.operationCompletionStatus ?? "" },
+                new SQL_QUERY_PARAMETER { Name = "operationSourceUserName", Value = OperationData.operationSourceUserName ?? "" },
+                new SQL_QUERY_PARAMETER { Name = "operationSourcePNodeID", Value = OperationData.operationSourcePNodeID ?? 1 },
+                new SQL_QUERY_PARAMETER { Name = "operationAction", Value = OperationData.operationAction ?? "" },
+                new SQL_QUERY_PARAMETER { Name = "operationDescription", Value = OperationData.operationDescription ?? "" },
+                new SQL_QUERY_PARAMETER { Name = "operationSeverityLevelID", Value = OperationData.operationSeverityLevelID ?? 1 }
             };
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);

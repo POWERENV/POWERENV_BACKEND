@@ -49,6 +49,30 @@ namespace POWERENV_BACKEND_API.Controllers
             DB_HANDLER = new POWERDB_PGSQL_DATA_HANDLING(AppContext.BaseDirectory);
         }
 
+        [HttpGet("getRecentActivity")]
+        public IActionResult DBGetRecentActivity()
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            int userId;
+
+            if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId))
+            {
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.GlobalEvent> recentActivityInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetRecentActivity(userId);
+
+                response.operationStatus = true;
+                response.statusMessage = "Recent activity data successfully received!";
+                response.packetData = recentActivityInfoList;
+            }
+            else
+            {
+                response.operationStatus = false;
+                response.statusMessage = "Can't parse userID to integer!!!";
+            }
+
+            return Ok(response);
+        }
+
         [HttpGet("getPGridsList")]
         public IActionResult DBGetPGridsList()
         {
@@ -186,19 +210,31 @@ namespace POWERENV_BACKEND_API.Controllers
 
             int readmeTextRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBPNodeEditReadme(_pnodeID, newReadmeText);
 
-            PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
+            try
             {
-                operationCatName = "DOCUMENTATION",
-                operationSourcePNodeID = _pnodeID,
-                operationAction = $"NodeEditReadme",
-                operationCompletionStatus = "SUCCESS",
-                operationSourceUserName = "Alice Wonder"
-            };
+                string userId = User.FindFirst(ClaimTypes.Name)?.Value;
 
-            int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
+                {
+                    operationCatName = "DOCUMENTATION",
+                    operationSourcePNodeID = _pnodeID,
+                    operationAction = $"NodeEditReadme",
+                    operationDescription = $"PNode '{_pnodeID}' readme text was edited by {userId}.",
+                    operationSeverityLevelID = 1,
+                    operationCompletionStatus = "SUCCESS",
+                    operationSourceUserName = userId
+                };
 
-            response.operationStatus = true;
-            response.statusMessage = "PNode Readme successfully received!";
+                int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+
+                response.operationStatus = true;
+                response.statusMessage = "PNode Readme successfully received!";
+            }
+            catch(Exception error)
+            {
+                response.operationStatus = false;
+                response.statusMessage = "PNode Readme updated, but operation log creation failed!!! Error: ${error}";
+            }
 
             return Ok(response);
         }

@@ -36,6 +36,18 @@ namespace POWERENV_DB_HANDLER.USER_DATA_HANDLING
             public string Password { get; set; } = string.Empty;
         }
 
+        public record NotificationInfo
+        {
+            public int NotificationId { get; set; }
+            public string SeverityLevel { get; set; }
+            public string Title { get; set; }
+            public string Description { get; set; }
+            public string TriggeredAt { get; set; }
+            public string NotificationTargetUsername { get; set; }
+            public string NotificationAcknowledgementDatetime { get; set; }
+            public string NotificationResolvedDatetime { get; set; }
+        }
+
         #endregion
 
         public USER_DATA_HANDLING(string dataSourceDirPath)
@@ -100,6 +112,58 @@ namespace POWERENV_DB_HANDLER.USER_DATA_HANDLING
                 new SQL_QUERY_PARAMETER { Name = "user_last_name", Value = newUserFormData.LastName },
                 new SQL_QUERY_PARAMETER { Name = "user_email", Value = newUserFormData.Email },
                 new SQL_QUERY_PARAMETER { Name = "user_password_hash", Value = newUserFormData.Password }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            return connectionInfo.rowsAffected;
+        }
+
+        public List<NotificationInfo> DBGetUserNotifications(int userID)
+        {
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_GET_USER_NOTIFICATIONS(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER { Name = "userID", Value = userID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<NotificationInfo> notificationInfoList = new List<NotificationInfo>();
+
+            while (connectionInfo.reader.Read())
+            {
+                NotificationInfo notificationInfo = new NotificationInfo() {
+                    NotificationId = connectionInfo.reader.GetInt32(0),
+                    SeverityLevel = connectionInfo.reader.GetString(1),
+                    Title = connectionInfo.reader.GetString(2),
+                    Description = connectionInfo.reader.GetString(3),
+                    TriggeredAt = connectionInfo.reader.GetDateTime(4).ToString(),
+                    NotificationTargetUsername = connectionInfo.reader.GetString(5),
+                    NotificationAcknowledgementDatetime = connectionInfo.reader.GetDateTime(6).ToString(),
+                    NotificationResolvedDatetime = connectionInfo.reader.GetDateTime(7).ToString()
+                };
+
+                notificationInfoList.Add(notificationInfo);
+            }
+
+            connectionInfo.conn.Close();
+
+            return notificationInfoList;
+        }
+
+        public int DBMarkNotificationAsResolved(int notificationID)
+        {
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_MARK_EVENT_AS_RESOLVED(@NotificationID, NULL);" +
+                "COMMIT;";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER { Name = "NotificationID", Value = notificationID }
             };
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);

@@ -73,6 +73,3 @@ AS $$
         GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
     END;
 $$;
-
-ALTER SEQUENCE users_user_id_seq RESTART WITH 3;
-SELECT * FROM USERS;

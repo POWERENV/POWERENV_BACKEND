@@ -389,11 +389,13 @@ CREATE OR REPLACE PROCEDURE SP_INSERT_PNODE_SINGLE_OPERATION (
     _operationSourceUserName VARCHAR,
     _operationSourcePNodeID INTEGER,
     _operationAction VARCHAR(50),
+    _operationDescription TEXT,
+    _operationSeverityLevelID INTEGER,
     OUT _rowsAffected INT
 )
 LANGUAGE plpgsql
 AS $$
-    DECLARE
+    DECLARE _PNODE_PGRID_ID INTEGER; PNODE_PGRID_OWNER_ID INTEGER; _OPERATION_SUBSCRIBER_USERS_IDS INTEGER ARRAY;
     BEGIN
         WITH operationCatID_CTE AS (
             SELECT OPERATION_CAT_ID AS CAT_ID
@@ -434,7 +436,31 @@ AS $$
             (
                 SELECT userID_CTE.USERID
                 FROM userID_CTE
-           )
+            )
+        );
+
+        SELECT PGRIDS.pgrid_id,
+               pgrid_owner_id
+                INTO _PNODE_PGRID_ID,
+                PNODE_PGRID_OWNER_ID
+        FROM PGRIDS
+            INNER JOIN PPOOLS ON PGRIDS.PGRID_ID = PPOOLS.PPOOL_ASSOCIATERD_PGRID_ID
+            INNER JOIN PNODES ON PPOOLS.PPOOL_ID = PNODES.PNODE_ASSOCIATED_PPOOL_ID
+        WHERE PNODE_ID = _operationSourcePNodeID
+        LIMIT 1;
+
+        SELECT ARRAY_AGG(access_policy_target_user_id)
+            INTO _OPERATION_SUBSCRIBER_USERS_IDS
+        FROM PGRID_ACCESS_POLICIES
+        WHERE access_policy_pgrid_id = _PNODE_PGRID_ID;
+
+        _OPERATION_SUBSCRIBER_USERS_IDS := ARRAY_APPEND(_OPERATION_SUBSCRIBER_USERS_IDS, PNODE_PGRID_OWNER_ID);
+
+        CALL SP_INSERT_EVENT_LOG (
+            _operationSeverityLevelID,
+            _operationAction,
+            _operationDescription,
+            _OPERATION_SUBSCRIBER_USERS_IDS
         );
 
         GET DIAGNOSTICS _rowsAffected = ROW_COUNT;

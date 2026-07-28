@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWER_ENV;
 using POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -113,16 +114,28 @@ namespace POWERENV_BACKEND_API.Controllers
                 };
             }
 
-            PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
+            try
             {
-                operationCatName = "FSP",
-                operationSourcePNodeID = _systemID,
-                operationAction = $"NodeEditDateTime",
-                operationCompletionStatus = response.operationStatus == true ? "SUCCESS" : "FAILURE",
-                operationSourceUserName = "Alice Wonder"
-            };
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
 
-            DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
+                {
+                    operationCatName = "FSP",
+                    operationSourcePNodeID = _systemID,
+                    operationAction = $"NodeEditDateTime",
+                    operationDescription = $"PNode {_systemID} FSP pre-processor datetime was changed by {userName}.",
+                    operationSeverityLevelID = 3,
+                    operationCompletionStatus = response.operationStatus == true ? "SUCCESS" : "FAILURE",
+                    operationSourceUserName = userName
+                };
+
+                DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = "System date and time set, but operation log creation failed!!! Error: ${error}";
+            }
 
             return Ok(response);
         }

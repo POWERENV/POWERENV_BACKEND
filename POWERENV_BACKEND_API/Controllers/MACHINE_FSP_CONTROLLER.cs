@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWER_ENV;
 using POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWER_ENV.FSP_MGMT;
 using static POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
@@ -156,27 +157,38 @@ namespace POWERENV_BACKEND_API.Controllers
                 POWER_ENV.POWERENV.SendCommand("\n", 500);
                 string receivedData = POWER_ENV.POWERENV.GetReceivedData();
 
-                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
+                try
                 {
-                    operationCatName = "REMOTE_ACCESS",
-                    operationSourcePNodeID = _systemID,
-                    operationAction = $"NodeAccessASMIConsole",
-                    operationCompletionStatus = "SUCCESS",
-                    operationSourceUserName = "Alice Wonder"
-                };
+                    string userName = User.FindFirst(ClaimTypes.Name)?.Value;
 
-                int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+                    PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
+                    {
+                        operationCatName = "REMOTE_ACCESS",
+                        operationSourcePNodeID = _systemID,
+                        operationAction = $"NodeAccessASMIConsole",
+                        operationCompletionStatus = "SUCCESS",
+                        operationSourceUserName = userName
+                    };
 
-                if(pnodePowerOnOperationRegistryRowsAffected > 0)
-                {
-                    response.operationStatus = true;
-                    response.statusMessage = "ASMI Session Started!!!";
+                    int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+
+                    if (pnodePowerOnOperationRegistryRowsAffected > 0)
+                    {
+                        response.operationStatus = true;
+                        response.statusMessage = "ASMI Session Started!!!";
+                    }
+                    else
+                    {
+                        response.operationStatus = false;
+                        response.statusMessage = "ASMI Session started, but database not updated (internal parameter mismatch)!";
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
                     response.operationStatus = false;
-                    response.statusMessage = "ASMI Session started, but database not updated (internal parameter mismatch)!";
+                    response.statusMessage = ex.Message;
                 }
+                
                 response.packetData = receivedData;
             }
             catch (Exception ex)

@@ -129,6 +129,8 @@ namespace POWERENV_PGSQL_DB_HANDLER
             public int? operationBatchOperationID { get; set; }
             public string? operationBatchOperationName { get; set; }
             public string? operationAction { get; set; }
+            public string? operationDescription { get; set; }
+            public int? operationSeverityLevelID { get; set; }
             public string? operationCompletionStatus { get; set; }
             public string? operationDateTime { get; set; }
             public string? operationSourceUserName { get; set; }
@@ -255,6 +257,18 @@ namespace POWERENV_PGSQL_DB_HANDLER
             public string? pendingCommand { get; set; }
         };
 
+        public record GlobalEvent
+        {
+            public int GlobalEventId { get; set; }
+            public string GlobalEventSeverityLevel { get; set; }
+            public string GlobalEventTitle { get; set; }
+            public string GlobalEventDescription { get; set; }
+            public DateTime GlobalEventTriggeredAt { get; set; }
+            public string NotificationTargetUsername { get; set; }
+            public DateTime NotificationAcknowledgementTimestamp { get; set; }
+            public DateTime NotificationResolvedTimestamp { get; set; }
+        }
+
         #endregion VARIABLE_DEFINITION
 
         public PSYSTEMS_HARDWARE_DATA_HANDLING(string dataSourceDirPath) {
@@ -271,6 +285,43 @@ namespace POWERENV_PGSQL_DB_HANDLER
             NpgsqlDataSourceBuilder dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
             dataSourceBuilder.MapComposite<FSPErrorLogFRUInfo>("ERROR_LOG_NHFRU_RECORD_LIST_TYPE");
             NpgsqlDataSource dataSource = dataSourceBuilder.Build();
+        }
+
+        public List<GlobalEvent> DBGetRecentActivity(int userID)
+        {
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_GET_USER_LATEST_EVENTS(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<GlobalEvent> pgridsBasicInfoList = new List<GlobalEvent>();
+
+            while (connectionInfo.reader.Read())
+            {
+                GlobalEvent recentEventInfo = new GlobalEvent
+                {
+                    GlobalEventId = connectionInfo.reader.GetInt32(0),
+                    GlobalEventSeverityLevel = connectionInfo.reader.GetString(1),
+                    GlobalEventTitle = connectionInfo.reader.GetString(2),
+                    GlobalEventDescription = connectionInfo.reader.GetString(3),
+                    GlobalEventTriggeredAt = connectionInfo.reader.GetDateTime(4),
+                    NotificationTargetUsername = connectionInfo.reader.GetString(5),
+                    NotificationAcknowledgementTimestamp = connectionInfo.reader.GetDateTime(6),
+                    NotificationResolvedTimestamp = connectionInfo.reader.GetDateTime(7),
+                };
+                pgridsBasicInfoList.Add(recentEventInfo);
+            }
+
+            connectionInfo.conn.Close();
+
+            return pgridsBasicInfoList;
         }
 
         public List<PGridBasicInfo> DBGetPGrids(int userID)
