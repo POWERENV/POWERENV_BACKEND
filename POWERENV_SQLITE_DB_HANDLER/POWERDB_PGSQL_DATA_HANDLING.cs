@@ -1,8 +1,6 @@
-﻿using POWERENV_DB_HANDLER;
-using Npgsql;
-using POWERENV_DB_HANDLER.USER_DATA_HANDLING;
+﻿using Npgsql;
 
-namespace POWERENV_PGSQL_DB_HANDLER
+namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
     /// <summary>
     /// PostgreSQL database connection info class, derived from the generic ICONNECTION_INFO database connection info interface.

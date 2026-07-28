@@ -1,8 +1,7 @@
 ﻿using Npgsql;
-using POWERENV_DB_HANDLER;
-using static POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
-namespace POWERENV_PGSQL_DB_HANDLER
+namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
     public partial class PSYSTEMS_HARDWARE_DATA_HANDLING
     {
@@ -301,7 +300,7 @@ namespace POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
-            List<GlobalEvent> pgridsBasicInfoList = new List<GlobalEvent>();
+            List<GlobalEvent> recentActivityList = new List<GlobalEvent>();
 
             while (connectionInfo.reader.Read())
             {
@@ -316,12 +315,49 @@ namespace POWERENV_PGSQL_DB_HANDLER
                     NotificationAcknowledgementTimestamp = connectionInfo.reader.GetDateTime(6),
                     NotificationResolvedTimestamp = connectionInfo.reader.GetDateTime(7),
                 };
-                pgridsBasicInfoList.Add(recentEventInfo);
+                recentActivityList.Add(recentEventInfo);
             }
 
             connectionInfo.conn.Close();
 
-            return pgridsBasicInfoList;
+            return recentActivityList;
+        }
+
+        public List<GlobalEvent> DBGetGlobalEventsActivity(int userID)
+        {
+            string sqlCommandText = "BEGIN TRANSACTION;" +
+                "CALL SP_GET_USER_EVENTS(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";" +
+                "COMMIT;";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<GlobalEvent> globalEventsActivityList = new List<GlobalEvent>();
+
+            while (connectionInfo.reader.Read())
+            {
+                GlobalEvent globalEventInfo = new GlobalEvent
+                {
+                    GlobalEventId = connectionInfo.reader.GetInt32(0),
+                    GlobalEventSeverityLevel = connectionInfo.reader.GetString(1),
+                    GlobalEventTitle = connectionInfo.reader.GetString(2),
+                    GlobalEventDescription = connectionInfo.reader.GetString(3),
+                    GlobalEventTriggeredAt = connectionInfo.reader.GetDateTime(4),
+                    NotificationTargetUsername = connectionInfo.reader.GetString(5),
+                    NotificationAcknowledgementTimestamp = connectionInfo.reader.GetDateTime(6),
+                    NotificationResolvedTimestamp = connectionInfo.reader.GetDateTime(7),
+                };
+                globalEventsActivityList.Add(globalEventInfo);
+            }
+
+            connectionInfo.conn.Close();
+
+            return globalEventsActivityList;
         }
 
         public List<PGridBasicInfo> DBGetPGrids(int userID)

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using POWERENV_PGSQL_DB_HANDLER;
 using System.Security.Claims;
-using static POWERENV_DB_HANDLER.USER_DATA_HANDLING.USER_DATA_HANDLING;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
 {

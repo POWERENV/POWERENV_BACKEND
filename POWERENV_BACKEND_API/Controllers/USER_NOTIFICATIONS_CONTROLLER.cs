@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using POWERENV_PGSQL_DB_HANDLER;
-using static POWERENV_DB_HANDLER.USER_DATA_HANDLING.USER_DATA_HANDLING;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
 {
@@ -15,14 +16,19 @@ namespace POWERENV_BACKEND_API.Controllers
             DB_HANDLER = new POWERDB_PGSQL_DATA_HANDLING(AppContext.BaseDirectory);
         }
 
-        [HttpGet("getUserNotifications_{userID}")]
-        public IActionResult DBGetUserNotificationsBatch([FromRoute] int userID)
+        [HttpGet("getUserNotifications")]
+        public IActionResult DBGetUserNotificationsBatch()
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
             try
             {
-                List<NotificationInfo> NotificationsListInfo = DB_HANDLER.USER_DATA_HANDLER.DBGetUserNotifications(userID);
+                string? strUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = -1;
+
+                if(!int.TryParse(strUserId, out userId)) throw new Exception("Can't parse UserId authentication cookie string to integer.");
+
+                List<NotificationInfo> NotificationsListInfo = DB_HANDLER.USER_DATA_HANDLER.DBGetUserNotifications(userId);
                 response.operationStatus = true;
                 response.statusMessage = "Notifications retrieved successfully!";
                 response.packetData = NotificationsListInfo;

@@ -1,8 +1,7 @@
-﻿using POWERENV_DB_HANDLER;
-using POWERENV_PGSQL_DB_HANDLER;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 
-namespace POWERDB_SQLITE_DATA_HANDLING
+namespace POWERENV_DB_HANDLER.POWERDB_SQLITE_DATA_HANDLING
 {
     /// <summary>
     /// SQLite database connection info class, derived from the generic ICONNECTION_INFO database connection info interface.

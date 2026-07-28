@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using POWERENV_PGSQL_DB_HANDLER;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 using System.Security.Claims;
-using static POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
 {
@@ -212,17 +212,17 @@ namespace POWERENV_BACKEND_API.Controllers
 
             try
             {
-                string userId = User.FindFirst(ClaimTypes.Name)?.Value;
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
 
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "DOCUMENTATION",
                     operationSourcePNodeID = _pnodeID,
                     operationAction = $"NodeEditReadme",
-                    operationDescription = $"PNode '{_pnodeID}' readme text was edited by {userId}.",
+                    operationDescription = $"PNode '{_pnodeID}' readme text was edited by {userName}.",
                     operationSeverityLevelID = 1,
                     operationCompletionStatus = "SUCCESS",
-                    operationSourceUserName = userId
+                    operationSourceUserName = userName
                 };
 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
