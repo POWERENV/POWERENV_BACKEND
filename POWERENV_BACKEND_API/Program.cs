@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using POWER_ENV.GLOBAL.NETWORK;
 using POWERENV_BACKEND_API.Redis;
 using POWERENV_BACKEND_API.SignalR;
-using StackExchange.Redis;
 
 namespace POWERENV_BACKEND_API
 {
@@ -17,18 +16,18 @@ namespace POWERENV_BACKEND_API
             public object packetData { get; set; }
         }
 
-        public struct STRUCT_NETWORK_INTERFACE_CONFIG_PACKED_DATA
+        public record STRUCT_NETWORK_INTERFACE_CONFIG_PACKED_DATA
         {
-            public int eth_index { get; set; }
-            public List<ENUM_STATIC_NETWORK_PROPERTIES> changedProperties { get; set; }
-            public List<string> newValues { get; set; }
-            public string IPAddressType { get; set; }
+            public required int eth_index { get; set; }
+            public required List<ENUM_STATIC_NETWORK_PROPERTIES> changedProperties { get; set; }
+            public required List<string> newValues { get; set; }
+            public required string IPAddressType { get; set; }
         }
 
-        public struct STRUCT_IP_ADDRESSES_PERMITIONS_DATA
+        public record STRUCT_IP_ADDRESSES_PERMITIONS_DATA
         {
-            public List<int> indexes { get; set; }
-            public List<string> IPAddresses { get; set; }
+            public required List<int> indexes { get; set; }
+            public required List<string> IPAddresses { get; set; }
         }
 
         public static void Main(string[] args)
@@ -63,13 +62,11 @@ namespace POWERENV_BACKEND_API
 
             builder.Services.AddControllers();
 
-            /*builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            builder.AddRedisDistributedCache("RedisCache", configureOptions: options =>
             {
-                var config = sp.GetRequiredService<IConfiguration>();
-                return ConnectionMultiplexer.Connect(config.GetConnectionString("RedisCache"));
-            });*/
-
-            builder.AddRedisDistributedCache("RedisCache");
+                options.AbortOnConnectFail = false;
+                options.ConnectTimeout = 5000;
+            });
 
             // 3. Configure Security perimeter policies
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
