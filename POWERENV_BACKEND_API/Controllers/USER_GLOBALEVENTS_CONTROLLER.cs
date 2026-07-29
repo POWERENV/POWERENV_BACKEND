@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
-using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
+using System.Security.Claims;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
 {
@@ -17,15 +18,20 @@ namespace POWERENV_BACKEND_API.Controllers
         }
 
         [HttpGet("getUserGlobalEvents")]
-        public IActionResult DBGetUserGlobalEvents([FromRoute] int userID)
+        public IActionResult DBGetUserGlobalEvents()
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
             try
             {
-                List<GlobalEvent> NotificationsListInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventsActivity(userID);
+                string? strUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                int userId = -1;
+
+                if (!int.TryParse(strUserId, out userId)) throw new Exception("Can't parse UserId authentication cookie string to integer.");
+
+                List<GlobalEvent> NotificationsListInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventsActivity(userId);
                 response.operationStatus = true;
-                response.statusMessage = "Notifications retrieved successfully!";
+                response.statusMessage = "Global Events retrieved successfully!";
                 response.packetData = NotificationsListInfo;
             }
             catch (Exception ex)

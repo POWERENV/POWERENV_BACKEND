@@ -117,13 +117,14 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
 
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                 {
                     operationCatName = "FSP",
                     operationSourcePNodeID = _systemID,
                     operationAction = $"NodeEditDateTime",
-                    operationDescription = $"PNode {_systemID} FSP pre-processor datetime was changed by {userName}.",
+                    operationDescription = $"PNode {pnodeNickname} FSP pre-processor datetime was changed by {userName}.",
                     operationSeverityLevelID = 3,
                     operationCompletionStatus = response.operationStatus == true ? "SUCCESS" : "FAILURE",
                     operationSourceUserName = userName

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWER_ENV;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -35,12 +36,17 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 1);
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory() {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodePowerOn",
+                    operationDescription = $"PNode '{pnodeNickname}' was powered on by {userName}.",
+                    operationSeverityLevelID = 3,
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
                 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
@@ -75,13 +81,18 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 2);
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodePowerOff",
+                    operationDescription = $"PNode '{pnodeNickname}' was powered off by {userName}.",
+                    operationSeverityLevelID = 3,
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
@@ -116,13 +127,18 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeActivenessState(_systemID, 1);
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodeRestart",
+                    operationDescription = $"PNode '{pnodeNickname}' was restarted by {userName}.",
+                    operationSeverityLevelID = 3,
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
@@ -157,13 +173,18 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeAttentionLEDState(_systemID, "OFF");
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodePowerOffAttentionLed",
+                    operationDescription = $"PNode '{pnodeNickname}' Attention LED turned off by {userName}.",
+                    operationSeverityLevelID = 1,
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);

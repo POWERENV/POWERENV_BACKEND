@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 using POWER_ENV;
 using POWER_ENV.GLOBAL.NETWORK;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWERENV_BACKEND_API.Program;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
@@ -112,18 +113,23 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int pnodeActivenessStateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.updatePNodeNICsInfo(newNicInfo);
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                 {
                     operationCatName = "NETWORK",
                     operationSourcePNodeID = _systemID,
                     operationAction = $"NodeChangeNIC{networkInterfaceConfigChangeData.eth_index}Configs",
+                    operationDescription = $"PNode '{pnodeNickname}' Network Interface Card 'NIC{networkInterfaceConfigChangeData.eth_index}' configurations changed by {userName}.",
+                    operationSeverityLevelID = 3,
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
 
-                int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
+                int pnodeOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
 
-                response = checkDBInsertionSuccessState(new int[] { pnodeActivenessStateUpdateRowsAffected, pnodePowerOnOperationRegistryRowsAffected }, new string[] { "Network information", "Network information" });
+                response = checkDBInsertionSuccessState(new int[] { pnodeActivenessStateUpdateRowsAffected, pnodeOperationRegistryRowsAffected }, new string[] { "Network information", "Network information" });
             }
             catch (Exception ex)
             {
@@ -219,13 +225,18 @@ namespace POWERENV_BACKEND_API.Controllers
                         pnodeActivenessStateUpdateRowsAffected = UpdateAccessPoliciesIndexDB(newETHAccessPolicy);
                     }
 
+                    string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                    string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                     PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                     {
                         operationCatName = "NETWORK",
                         operationSourcePNodeID = _systemID,
                         operationAction = $"NodeEditAllowedIPAddresses",
+                        operationDescription = $"PNode '{pnodeNickname}' Allowed IP Addresses list was edited by {userName}.",
+                        operationSeverityLevelID = 3,
                         operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                        operationSourceUserName = "Alice Wonder"
+                        operationSourceUserName = userName
                     };
 
                     int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
@@ -276,13 +287,18 @@ namespace POWERENV_BACKEND_API.Controllers
                         pnodeActivenessStateUpdateRowsAffected = UpdateAccessPoliciesIndexDB(newETHAccessPolicy);
                     }
 
+                    string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                    string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
+
                     PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
                     {
                         operationCatName = "NETWORK",
                         operationSourcePNodeID = _systemID,
                         operationAction = $"NodeEditDeniedIPAddresses",
+                        operationDescription = $"PNode '{pnodeNickname}' Denied IP Addresses list was edited by {userName}.",
+                        operationSeverityLevelID = 3,
                         operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
-                        operationSourceUserName = "Alice Wonder"
+                        operationSourceUserName = userName
                     };
 
                     int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);

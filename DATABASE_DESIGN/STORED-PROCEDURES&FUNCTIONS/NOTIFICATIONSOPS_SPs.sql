@@ -18,7 +18,8 @@ AS $$
                 ACKNOWLEDGED_AT,
                 RESOLVED_AT
             FROM VW_EVENTS_INFO
-            WHERE USER_ID = _USER_ID;
+            WHERE USER_ID = _USER_ID
+            ORDER BY GLOBAL_EVENT_TRIGGERED_AT DESC;
     END;
 $$;
 

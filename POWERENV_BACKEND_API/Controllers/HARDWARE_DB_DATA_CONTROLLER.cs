@@ -213,13 +213,14 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_pnodeID).pnode_nickname;
 
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "DOCUMENTATION",
                     operationSourcePNodeID = _pnodeID,
                     operationAction = $"NodeEditReadme",
-                    operationDescription = $"PNode '{_pnodeID}' readme text was edited by {userName}.",
+                    operationDescription = $"PNode '{pnodeNickname}' readme text was edited by {userName}.",
                     operationSeverityLevelID = 1,
                     operationCompletionStatus = "SUCCESS",
                     operationSourceUserName = userName

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
-using System.Text.Json;
 using POWER_ENV;
-using XTELNET;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using StackExchange.Redis;
+using System.Security.Claims;
+using System.Text.Json;
+using XTELNET;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -57,13 +58,18 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 await db.ListRightPushAsync("osSessionQueue", jsonSessionInfo);
 
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(pnode_id).pnode_nickname;
+
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {
                     operationCatName = "REMOTE_ACCESS",
                     operationSourcePNodeID = pnode_id,
                     operationAction = $"NodeAccessOSConsole",
+                    operationDescription = $"PNode '{pnodeNickname}' OS remote shell was accessed by {userName}.",
+                    operationSeverityLevelID = 1,
                     operationCompletionStatus = "SUCCESS",
-                    operationSourceUserName = "Alice Wonder"
+                    operationSourceUserName = userName
                 };
 
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
