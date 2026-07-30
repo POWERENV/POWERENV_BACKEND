@@ -1,4 +1,6 @@
 ﻿using Npgsql;
+using System.Data;
+using System.Transactions;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
@@ -9,6 +11,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     {
         public NpgsqlConnection conn { get; set; }
         public NpgsqlDataReader reader { get; set; }
+        public DataTable resultsDataTable { get; set; }
         public int rowsAffected { get; set; }
     }
 
@@ -61,20 +64,45 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <returns>ICONNECTION_INFO packet object.</returns>
         public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor)
         {
+            DataTable resultDataTable = new DataTable();
             PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO();
             connectionInfo.conn = new NpgsqlConnection(_connectionString);
             connectionInfo.conn.Open();
 
-            var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+            using NpgsqlTransaction transaction = connectionInfo.conn.BeginTransaction();
 
-            for(int i = 0; i < parameters.Length; i++)
+            try
             {
-                cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                }
+
+                connectionInfo.reader = cmd.ExecuteReader();
+
+                if (hasCursor) connectionInfo.reader.NextResult();
+
+                resultDataTable.Load(connectionInfo.reader);
+                connectionInfo.resultsDataTable = resultDataTable;
+
+                transaction.Commit();
+                connectionInfo.conn.Close();
             }
+            catch (Exception ex)
+            {
+                if (connectionInfo.reader != null && !connectionInfo.reader.IsClosed) connectionInfo.reader.Close();
 
-            connectionInfo.reader = cmd.ExecuteReader();
-
-            if (hasCursor) connectionInfo.reader.NextResult();
+                try
+                {
+                    transaction.Rollback();
+                }
+                catch (InvalidOperationException) { }
+                
+                connectionInfo.conn.Close();
+                throw;
+            }
 
             return connectionInfo;
         }
@@ -115,31 +143,52 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             connectionInfo.conn = new NpgsqlConnection(_connectionString);
             connectionInfo.conn.Open();
 
-            var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+            using NpgsqlTransaction transaction = connectionInfo.conn.BeginTransaction();
 
-            for(int i = 0; i < parameters.Length; i++)
+            try
             {
-                cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                }
+
+                if (isStoredProcedure)
+                {
+                    object? nonQueryResult = cmd.ExecuteScalar();
+
+                    try
+                    {
+                        connectionInfo.rowsAffected = Convert.ToInt32(nonQueryResult);
+                    }
+                    catch (Exception ex)
+                    {
+                        connectionInfo.rowsAffected = -1;
+                        Console.WriteLine($"Error converting result to int: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    int nonQueryResult = cmd.ExecuteNonQuery();
+                    connectionInfo.rowsAffected = nonQueryResult;
+                }
+
+                transaction.Commit();
+                connectionInfo.conn.Close();
             }
-
-            if (isStoredProcedure)
+            catch(Exception ex)
             {
-                object? nonQueryResult = cmd.ExecuteScalar();
+                if (connectionInfo.reader != null && !connectionInfo.reader.IsClosed) connectionInfo.reader.Close();
 
                 try
                 {
-                    connectionInfo.rowsAffected = Convert.ToInt32(nonQueryResult);
+                    transaction.Rollback();
                 }
-                catch (Exception ex)
-                {
-                    connectionInfo.rowsAffected = -1;
-                    Console.WriteLine($"Error converting result to int: {ex.Message}");
-                }
-            }
-            else
-            {
-                int nonQueryResult = cmd.ExecuteNonQuery();
-                connectionInfo.rowsAffected = nonQueryResult;
+                catch (InvalidOperationException) { }
+
+                connectionInfo.conn.Close();
+                throw;
             }
 
             return connectionInfo;

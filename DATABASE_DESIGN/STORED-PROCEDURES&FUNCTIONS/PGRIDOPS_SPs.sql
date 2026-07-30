@@ -32,7 +32,7 @@ BEGIN
                 WHERE PGRIDS.pgrid_owner_id = _USER_ID
                 ORDER BY pgrids.PGRID_ID
             )
-            UNION
+            UNION ALL
             (
                 SELECT access_policy_pgrid_id,
                        PGRIDS.pgrid_name,

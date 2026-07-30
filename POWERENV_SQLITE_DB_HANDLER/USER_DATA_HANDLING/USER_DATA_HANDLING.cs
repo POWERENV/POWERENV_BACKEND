@@ -74,22 +74,20 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             UserProfileInfo userProfile = new UserProfileInfo();
 
-            while (connectionInfo.reader.Read())
+            for(int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 userProfile = new UserProfileInfo
                 {
-                    user_id = connectionInfo.reader.GetInt32(0),
-                    user_first_name = connectionInfo.reader.GetString(1),
-                    user_last_name = connectionInfo.reader.GetString(2),
-                    user_email = connectionInfo.reader.GetString(3),
-                    user_password_hash = connectionInfo.reader.GetString(4),
-                    user_profile_picture = connectionInfo.reader.GetString(5),
-                    user_signup_datetime = connectionInfo.reader.GetDateTime(6).ToString(),
-                    user_last_login_datetime = connectionInfo.reader.GetDateTime(7).ToString()
+                    user_id = (int)(connectionInfo.resultsDataTable.Rows[i][0]),
+                    user_first_name = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    user_last_name = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    user_email = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    user_password_hash = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    user_profile_picture = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
+                    user_signup_datetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][6]).ToString(),
+                    user_last_login_datetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][7]).ToString()
                 };
             }
-
-            connectionInfo.conn.Close();
 
             return userProfile;
         }
@@ -118,10 +116,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public List<NotificationInfo> DBGetUserNotifications(int userID)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                "CALL SP_GET_USER_NOTIFICATIONS(@userID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = "CALL SP_GET_USER_NOTIFICATIONS(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
             {
@@ -132,23 +128,22 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<NotificationInfo> notificationInfoList = new List<NotificationInfo>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
-                NotificationInfo notificationInfo = new NotificationInfo() {
-                    NotificationId = connectionInfo.reader.GetInt32(0),
-                    SeverityLevel = connectionInfo.reader.GetString(1),
-                    Title = connectionInfo.reader.GetString(2),
-                    Description = connectionInfo.reader.GetString(3),
-                    TriggeredAt = connectionInfo.reader.GetDateTime(4).ToString(),
-                    NotificationTargetUsername = connectionInfo.reader.GetString(5),
-                    NotificationAcknowledgementDatetime = connectionInfo.reader.GetDateTime(6).ToString(),
-                    NotificationResolvedDatetime = connectionInfo.reader.GetDateTime(7).ToString()
+                NotificationInfo notificationInfo = new NotificationInfo()
+                {
+                    NotificationId = (int)(connectionInfo.resultsDataTable.Rows[i][0]),
+                    SeverityLevel = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    Title = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    Description = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    TriggeredAt = ((DateTime)connectionInfo.resultsDataTable.Rows[i][4]).ToString(),
+                    NotificationTargetUsername = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
+                    NotificationAcknowledgementDatetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][6]).ToString(),
+                    NotificationResolvedDatetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][7]).ToString()
                 };
 
                 notificationInfoList.Add(notificationInfo);
             }
-
-            connectionInfo.conn.Close();
 
             return notificationInfoList;
         }

@@ -1,4 +1,5 @@
 ﻿using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
@@ -10,10 +11,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public List<PNodesBasicInfo> DBGetPGPPoolPNodesList(int _targetPPoolID)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL sp_get_ppool_pnodes_list(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL sp_get_ppool_pnodes_list(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
@@ -23,29 +22,25 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PNodesBasicInfo> pnodesInfoList = new List<PNodesBasicInfo>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 PNodesBasicInfo pnodeInfo = new PNodesBasicInfo
                 {
-                    pnodeID = connectionInfo.reader.GetInt32(0),
-                    pnodeName = connectionInfo.reader.GetString(1),
-                    pnodeLparsCount = connectionInfo.reader.GetInt32(2)
+                    pnodeID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    pnodeName = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    pnodeLparsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][2])
                 };
 
                 pnodesInfoList.Add(pnodeInfo);
             }
-
-            connectionInfo.conn.Close();
 
             return pnodesInfoList;
         }
 
         public PPoolFullInfo DBGetPPoolFullInfo(int _targetPPoolID)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_FULL_INFO(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_FULL_INFO(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
@@ -55,33 +50,29 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             PPoolFullInfo pgridFullInfo = new PPoolFullInfo();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 pgridFullInfo = new PPoolFullInfo()
                 {
-                    ppool_id = connectionInfo.reader.GetInt32(0),
-                    ppool_name = connectionInfo.reader.GetString(1),
-                    ppool_tag = connectionInfo.reader.GetString(2),
-                    ppool_parent_pgrid_name = connectionInfo.reader.GetString(3),
-                    ppool_creation_datetime = connectionInfo.reader.GetDateTime(4).ToString(),
-                    ppool_last_update_datetime = connectionInfo.reader.GetDateTime(5).ToString(),
-                    ppool_readme_text = connectionInfo.reader.GetString(6),
-                    ppool_pnodes_count = connectionInfo.reader.GetInt32(7),
-                    ppool_active_pnodes_count = connectionInfo.reader.GetInt32(8)
+                    ppool_id = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    ppool_name = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    ppool_tag = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    ppool_parent_pgrid_name = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    ppool_creation_datetime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][4])).ToString(),
+                    ppool_last_update_datetime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][5])).ToString(),
+                    ppool_readme_text = (string)(connectionInfo.resultsDataTable.Rows[i][6]),
+                    ppool_pnodes_count = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][7]),
+                    ppool_active_pnodes_count = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][8])
                 };
             }
-
-            connectionInfo.conn.Close();
 
             return pgridFullInfo;
         }
 
         public List<NodesLoginAudits> DBGetPPoolsLoginAudits(int _targetPpool)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_LOGIN_AUDITS(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_LOGIN_AUDITS(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
@@ -91,33 +82,29 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 NodesLoginAudits pgridPnodeLoginAudit = new NodesLoginAudits
                 {
-                    login_audit_id = connectionInfo.reader.GetInt32(0),
-                    login_audit_fsp_user = connectionInfo.reader.GetString(1),
-                    login_audit_datetime = connectionInfo.reader.GetDateTime(2).ToString(),
-                    login_audit_login_status = connectionInfo.reader.GetString(3),
-                    login_audit_location = connectionInfo.reader.GetString(4),
-                    login_audit_pnode_nickname = connectionInfo.reader.GetString(5),
-                    login_audit_pnode_ppool_name = connectionInfo.reader.GetString(6)
+                    login_audit_id = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    login_audit_fsp_user = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    login_audit_datetime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][2])).ToString(),
+                    login_audit_login_status = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    login_audit_location = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    login_audit_pnode_nickname = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
+                    login_audit_pnode_ppool_name = (string)(connectionInfo.resultsDataTable.Rows[i][6])
                 };
 
                 pgridPnodesLoginAudits.Add(pgridPnodeLoginAudit);
             }
-
-            connectionInfo.conn.Close();
 
             return pgridPnodesLoginAudits;
         }
 
         public List<AttentionLEDPNodesInfo> DBGetPPoolAttentionLEDPNodes(int _targetPpool)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_ATTENTIONLED_PNODES(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_ATTENTIONLED_PNODES(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
@@ -127,28 +114,24 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 AttentionLEDPNodesInfo attentionLEDMarkedPNodeInfo = new AttentionLEDPNodesInfo
                 {
-                    pnode_nickname = connectionInfo.reader.GetString(0),
-                    ppool_name = connectionInfo.reader.GetString(1)
+                    pnode_nickname = (string)(connectionInfo.resultsDataTable.Rows[i][0]),
+                    ppool_name = (string)(connectionInfo.resultsDataTable.Rows[i][1])
                 };
 
                 attentionLEDMarkedPNodesInfo.Add(attentionLEDMarkedPNodeInfo);
             }
-
-            connectionInfo.conn.Close();
 
             return attentionLEDMarkedPNodesInfo;
         }
 
         public List<FSPErrorLogInfo> DBGetPPoolsErrorLogs(int _targetPpool)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_ERROR_LOGS(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_ERROR_LOGS(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
@@ -157,48 +140,44 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 List<string> actionFlags = new List<string>();
-                string[] a = connectionInfo.reader.GetString(6).Split("g");
+                string[] a = ((string)(connectionInfo.resultsDataTable.Rows[i][6])).Split(", ");
 
-                for (int i = 0; i < a.Length; i++)
+                for (int j = 0; j < a.Length; j++)
                 {
-                    actionFlags.Add(a[i]);
+                    actionFlags.Add(a[j]);
                 }
 
-                string[] logDateNTime = connectionInfo.reader.GetDateTime(1).ToString().Split(" ");
+                string[] logDateNTime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][1])).ToString().Split(" ");
 
-                FSPErrorLogInfo pgridPnodeErrorLog = new FSPErrorLogInfo()
+                FSPErrorLogInfo pnodeErrorLog = new FSPErrorLogInfo()
                 {
-                    ErrorLogID = connectionInfo.reader.GetString(0),
+                    ErrorLogID = (string)(connectionInfo.resultsDataTable.Rows[i][0]),
                     LogDate = logDateNTime[0],
                     LogTime = logDateNTime[1],
-                    DriverName = connectionInfo.reader.GetString(2),
-                    Subsystem = connectionInfo.reader.GetString(3),
-                    RawData = connectionInfo.reader.GetString(4),
-                    EventSeverity = connectionInfo.reader.GetString(5),
+                    DriverName = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    Subsystem = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    RawData = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    EventSeverity = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
                     ActionFlags = actionFlags,
-                    ActionStatus = connectionInfo.reader.GetString(7),
-                    ReferenceCode = connectionInfo.reader.GetString(8),
-                    PNodeNickname = connectionInfo.reader.GetString(9),
-                    PPoolName = connectionInfo.reader.GetString(10)
+                    ActionStatus = (string)(connectionInfo.resultsDataTable.Rows[i][7]),
+                    ReferenceCode = (string)(connectionInfo.resultsDataTable.Rows[i][8]),
+                    PNodeNickname = (string)(connectionInfo.resultsDataTable.Rows[i][9]),
+                    PPoolName = (string)(connectionInfo.resultsDataTable.Rows[i][10])
                 };
 
-                pgridPnodesErrorLogs.Add(pgridPnodeErrorLog);
+                pgridPnodesErrorLogs.Add(pnodeErrorLog);
             }
-
-            connectionInfo.conn.Close();
 
             return pgridPnodesErrorLogs;
         }
 
         private List<PNodesSingleOperationHistory> DBGetPPoolPNodesSingleOperationLogs(int _targetPPoolID)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_PNODES_SINGLE_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_PNODES_SINGLE_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
@@ -208,35 +187,31 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 PNodesSingleOperationHistory ppoolPNodesSingleOperationLog = new PNodesSingleOperationHistory()
                 {
-                    operationID = connectionInfo.reader.GetInt32(0),
-                    operationCatName = connectionInfo.reader.GetString(1),
-                    operationSourcePNodeName = connectionInfo.reader.GetString(2),
-                    operationBatchOperationID = connectionInfo.reader.GetInt32(3),
-                    operationBatchOperationName = connectionInfo.reader.GetString(4),
-                    operationAction = connectionInfo.reader.GetString(5),
-                    operationCompletionStatus = connectionInfo.reader.GetString(6),
-                    operationDateTime = connectionInfo.reader.GetDateTime(7).ToString(),
-                    operationSourceUserName = connectionInfo.reader.GetString(8)
+                    operationID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    operationCatName = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    operationSourcePNodeName = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    operationBatchOperationID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][3]),
+                    operationBatchOperationName = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    operationAction = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
+                    operationCompletionStatus = (string)(connectionInfo.resultsDataTable.Rows[i][6]),
+                    operationDateTime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][7])).ToString(),
+                    operationSourceUserName = (string)(connectionInfo.resultsDataTable.Rows[i][8])
                 };
 
                 ppoolPNodesSingleOperationHistory.Add(ppoolPNodesSingleOperationLog);
             }
-
-            connectionInfo.conn.Close();
 
             return ppoolPNodesSingleOperationHistory;
         }
 
         private List<PPoolsBatchOperationHistory> DBGetPPoolBatchOperationLogs(int _targetPPoolID)
         {
-            string sqlCommandText = "BEGIN TRANSACTION;" +
-                $"CALL SP_GET_PPOOL_BATCH_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
-                "FETCH ALL FROM \"CURSOR\";" +
-                "COMMIT;";
+            string sqlCommandText = $"CALL SP_GET_PPOOL_BATCH_OPERATION_LOGS(@targetPPoolID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
@@ -246,23 +221,21 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PPoolsBatchOperationHistory> ppoolBatchOperationHistory = new List<PPoolsBatchOperationHistory>();
 
-            while (connectionInfo.reader.Read())
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 PPoolsBatchOperationHistory ppoolBatchOperationLog = new PPoolsBatchOperationHistory()
                 {
-                    batchOperationID = connectionInfo.reader.GetInt32(0),
-                    batchOperationCatName = connectionInfo.reader.GetString(1),
-                    batchOperationSourcePPoolID = connectionInfo.reader.GetInt32(2),
-                    batchOperationSourcePPoolName = connectionInfo.reader.GetString(3),
-                    batchOperationAction = connectionInfo.reader.GetString(4),
-                    batchOperationDateTime = connectionInfo.reader.GetDateTime(5).ToString(),
-                    batchOperationSourceUserName = connectionInfo.reader.GetString(6),
+                    batchOperationID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    batchOperationCatName = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    batchOperationSourcePPoolID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][2]),
+                    batchOperationSourcePPoolName = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    batchOperationAction = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    batchOperationDateTime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][5])).ToString(),
+                    batchOperationSourceUserName = (string)(connectionInfo.resultsDataTable.Rows[i][6]),
                 };
 
                 ppoolBatchOperationHistory.Add(ppoolBatchOperationLog);
             }
-
-            connectionInfo.conn.Close();
 
             return ppoolBatchOperationHistory;
         }
@@ -284,9 +257,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public int DBPPoolEditReadme(int ppoolID, string newReadmeText)
         {
-            string sqlCommandText = $"BEGIN TRANSACTION;" +
-                $"CALL SP_PPOOL_EDIT_README(@ppoolID, @newReadmeText, NULL);" +
-                $"COMMIT;";
+            string sqlCommandText = $"CALL SP_PPOOL_EDIT_README(" +
+                $"@ppoolID," +
+                $"@newReadmeText," +
+                $"NULL" +
+                $");";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "ppoolID", Value = ppoolID },
