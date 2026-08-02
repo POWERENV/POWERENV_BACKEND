@@ -48,6 +48,66 @@ AS $$
     END;
 $$;
 
+CREATE OR REPLACE PROCEDURE SP_GET_USER_EVENT_TYPES_DISTRIBUTION (
+    _USER_ID INTEGER,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            WITH TEST_CTE AS (
+                SELECT *
+                FROM VW_EVENTS_INFO
+                WHERE VW_EVENTS_INFO.user_id = _USER_ID
+            )
+            SELECT COUNT(TEST_CTE.GLOBAL_EVENT_ID),
+                   global_event_severity.GLOBAL_EVENT_SEVERITY_ID,
+                   global_event_severity.GLOBAL_EVENT_SEVERITY_NAME
+            FROM global_event_severity
+            LEFT JOIN TEST_CTE ON TEST_CTE.global_event_severity_level_id = global_event_severity.global_event_severity_id
+            GROUP BY GLOBAL_EVENT_SEVERITY.global_event_severity_id,
+                     GLOBAL_EVENT_SEVERITY.global_event_severity_name
+            ORDER BY GLOBAL_EVENT_SEVERITY.global_event_severity_id ASC;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_GET_USER_EVENT_LOGGING_CADENCE_STATS (
+    _USER_ID INTEGER,
+    MIN_DAY_TIMESTAMP TIMESTAMPTZ,
+    _TIME_SCALE_UNIT VARCHAR,
+    INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        OPEN result_set FOR
+            WITH RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE AS (
+                SELECT DATE_TRUNC(_TIME_SCALE_UNIT, VW_EVENTS_INFO.global_event_triggered_at) AS PERIOD,
+                    COUNT(global_event_id) AS EVENTS_CADENCE
+                FROM VW_EVENTS_INFO
+                WHERE VW_EVENTS_INFO.global_event_triggered_at >= MIN_DAY_TIMESTAMP
+                  AND VW_EVENTS_INFO.user_id = _USER_ID
+                GROUP BY PERIOD
+                ORDER BY PERIOD
+            ),
+            TIMESTAMP_SEQUENCE_CTE AS (
+                SELECT GENERATE_SERIES (
+                   MIN(RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE.PERIOD),
+                   NOW(),
+                   ('1 ' || _TIME_SCALE_UNIT)::INTERVAL
+                ) AS TIMESTAMP_SERIES
+                FROM RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE
+            )
+            SELECT (TIMESTAMP_SEQUENCE_CTE.TIMESTAMP_SERIES AT TIME ZONE 'Europe/Lisbon')::VARCHAR AS HOURLY_INTERVAL_TIMESTAMP,
+                   COALESCE(RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE.EVENTS_CADENCE, 0) AS EVENT_CADENCE
+            FROM TIMESTAMP_SEQUENCE_CTE
+            LEFT JOIN RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE ON RECORDED_HOURLY_TIMESTAMP_INTERVALS_CTE.PERIOD = TIMESTAMP_SEQUENCE_CTE.TIMESTAMP_SERIES;
+    END;
+$$;
+
 CREATE OR REPLACE PROCEDURE SP_GET_USER_NOTIFICATIONS (
     _USER_ID INTEGER,
     INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor

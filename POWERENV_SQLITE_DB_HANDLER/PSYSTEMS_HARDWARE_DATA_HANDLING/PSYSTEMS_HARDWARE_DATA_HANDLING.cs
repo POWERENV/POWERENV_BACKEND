@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using System.Runtime.InteropServices.Marshalling;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
@@ -268,6 +269,26 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             public DateTime NotificationResolvedTimestamp { get; set; }
         }
 
+        public record GlobalEventTypesDistribution
+        {
+            public int informationalEventsCount { get; set; }
+            public int warningEventsCount { get; set; }
+            public int highImpactEventsCount { get; set; }
+            public int criticalEventsCount { get; set; }
+        }
+
+        public record GlobalEventCadenceRegistry
+        {
+            public DateTime hourlyIntervalTimestamp { get; set; }
+            public int eventCadence { get; set; }
+        }
+
+        public enum enum_timeScaleUnit
+        {
+            day,
+            hour
+        }
+
         #endregion VARIABLE_DEFINITION
 
         public PSYSTEMS_HARDWARE_DATA_HANDLING(string dataSourceDirPath) {
@@ -277,7 +298,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             if (DBPassword != null)
             {
-                connectionString = $"Host={DBIPAddress};Port={DBPort};Username=postgres;Password={DBPassword};Database=POWERENV-POWERDB";
+                connectionString = $"Host={DBIPAddress};Port={DBPort};Username=postgres;Password={DBPassword};Database=POWERENV-POWERDB;Timezone=UTC;";
             }
             else throw new Exception("FATAL ERROR: DATABASE KEYS NOT FOUND!");
 
@@ -352,6 +373,58 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             }
 
             return globalEventsActivityList;
+        }
+
+        public GlobalEventTypesDistribution DBGetGlobalEventTypesDistribution(int userID)
+        {
+            string sqlCommandText = "CALL SP_GET_USER_EVENT_TYPES_DISTRIBUTION(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            GlobalEventTypesDistribution globalEventTypesDistribution = new GlobalEventTypesDistribution() {
+                informationalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[0][0]),
+                warningEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[1][0]),
+                highImpactEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[2][0]),
+                criticalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[3][0])
+            };
+
+            return globalEventTypesDistribution;
+        }
+
+        public List<GlobalEventCadenceRegistry> DBGetGlobalEventCadenceStats(int userID, DateTime startDate, enum_timeScaleUnit timeScaleUnit)
+        {
+            string sqlCommandText = "CALL SP_GET_USER_EVENT_LOGGING_CADENCE_STATS(@userID, @startDate, @timeScaleUnit, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID},
+                new SQL_QUERY_PARAMETER() {Name = "startDate", Value = startDate.Date},
+                new SQL_QUERY_PARAMETER() {Name = "timeScaleUnit", Value = timeScaleUnit == enum_timeScaleUnit.day ? "day" : (timeScaleUnit == enum_timeScaleUnit.hour ? "hour" : "")}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<GlobalEventCadenceRegistry> globalEventCadenceStats = new List<GlobalEventCadenceRegistry>();
+
+            for(int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            {
+                GlobalEventCadenceRegistry globalEventCadenceRecord = new GlobalEventCadenceRegistry
+                {
+                    hourlyIntervalTimestamp = Convert.ToDateTime(connectionInfo.resultsDataTable.Rows[i][0]),
+                    eventCadence = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][1])
+                };
+
+                globalEventCadenceStats.Add(globalEventCadenceRecord);
+            }
+
+            return globalEventCadenceStats;
         }
 
         public List<PGridBasicInfo> DBGetPGrids(int userID)
