@@ -40,10 +40,10 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             public string SeverityLevel { get; set; }
             public string Title { get; set; }
             public string Description { get; set; }
-            public string TriggeredAt { get; set; }
+            public string? TriggeredAt { get; set; }
             public string NotificationTargetUsername { get; set; }
-            public string NotificationAcknowledgementDatetime { get; set; }
-            public string NotificationResolvedDatetime { get; set; }
+            public string? NotificationAcknowledgementDatetime { get; set; }
+            public string? NotificationResolvedDatetime { get; set; }
         }
 
         #endregion
@@ -117,6 +117,40 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public List<NotificationInfo> DBGetUserNotifications(int userID)
         {
             string sqlCommandText = "CALL SP_GET_USER_NOTIFICATIONS(@userID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]
+            {
+                new SQL_QUERY_PARAMETER { Name = "userID", Value = userID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<NotificationInfo> notificationInfoList = new List<NotificationInfo>();
+
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            {
+                NotificationInfo notificationInfo = new NotificationInfo()
+                {
+                    NotificationId = (int)(connectionInfo.resultsDataTable.Rows[i][0]),
+                    SeverityLevel = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    Title = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    Description = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    TriggeredAt = ((DateTime)connectionInfo.resultsDataTable.Rows[i][4]).ToString(),
+                    NotificationTargetUsername = (string)(connectionInfo.resultsDataTable.Rows[i][5]),
+                    NotificationAcknowledgementDatetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][6]).ToString(),
+                    NotificationResolvedDatetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][7]).ToString()
+                };
+
+                notificationInfoList.Add(notificationInfo);
+            }
+
+            return notificationInfoList;
+        }
+
+        public List<NotificationInfo> DBGetAllUserNotifications(int userID)
+        {
+            string sqlCommandText = "CALL SP_GET_ALL_USER_NOTIFICATIONS(@userID, 'CURSOR');" +
                 "FETCH ALL FROM \"CURSOR\";";
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = new SQL_QUERY_PARAMETER[]

@@ -417,7 +417,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             {
                 GlobalEventCadenceRegistry globalEventCadenceRecord = new GlobalEventCadenceRegistry
                 {
-                    hourlyIntervalTimestamp = Convert.ToDateTime(connectionInfo.resultsDataTable.Rows[i][0]),
+                    hourlyIntervalTimestamp = Convert.ToDateTime(connectionInfo.resultsDataTable.Rows[i][0]).ToUniversalTime(),
                     eventCadence = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][1])
                 };
 

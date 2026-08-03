@@ -2,6 +2,7 @@
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 using System.Security.Claims;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
+using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
 {
@@ -31,13 +32,17 @@ namespace POWERENV_BACKEND_API.Controllers
                 List<GlobalEvent> NotificationsListInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventsActivity(userId);
                 GlobalEventTypesDistribution GlobalEventsDistribution = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventTypesDistribution(userId);
                 List<GlobalEventCadenceRegistry> GlobalEventsCadenceStats = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventCadenceStats(userId, DateTime.Now.AddDays(-30), enum_timeScaleUnit.day);
+                List<NotificationInfo> userNotifications = DB_HANDLER.USER_DATA_HANDLER.DBGetAllUserNotifications(userId);
+                List<PPoolsBatchOperationHistory> userScheduledBatchOperations = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetUserBatchOperationLogs(userId);
 
                 response.operationStatus = true;
                 response.statusMessage = "Global Events retrieved successfully!";
                 response.packetData = new {
                     NotificationsListInfo,
                     GlobalEventsDistribution,
-                    GlobalEventsCadenceStats
+                    GlobalEventsCadenceStats,
+                    userNotifications,
+                    userScheduledBatchOperations
                 };
             }
             catch (Exception ex)
@@ -61,7 +66,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 if (!int.TryParse(strUserId, out userId)) throw new Exception("Can't parse UserId authentication cookie string to integer.");
 
-                enum_timeScaleUnit timeScaleUnit = statsTimeRange == 1 ? enum_timeScaleUnit.hour : enum_timeScaleUnit.day;
+                enum_timeScaleUnit timeScaleUnit = statsTimeRange == 0 ? enum_timeScaleUnit.hour : enum_timeScaleUnit.day;
 
                 List<GlobalEventCadenceRegistry> GlobalEventsCadenceStats = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetGlobalEventCadenceStats(userId, DateTime.Now.AddDays(-statsTimeRange), timeScaleUnit);
 

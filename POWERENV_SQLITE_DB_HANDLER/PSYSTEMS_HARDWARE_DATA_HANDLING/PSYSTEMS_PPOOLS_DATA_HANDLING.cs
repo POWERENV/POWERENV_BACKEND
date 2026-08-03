@@ -240,6 +240,38 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             return ppoolBatchOperationHistory;
         }
 
+        public List<PPoolsBatchOperationHistory> DBGetUserBatchOperationLogs(int _targetUserID)
+        {
+            string sqlCommandText = $"CALL SP_GET_USER_BATCH_OPERATION_LOGS(@targetUserID, 'CURSOR');" +
+                "FETCH ALL FROM \"CURSOR\";";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "targetUserID", Value = _targetUserID }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            List<PPoolsBatchOperationHistory> ppoolBatchOperationHistory = new List<PPoolsBatchOperationHistory>();
+
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            {
+                PPoolsBatchOperationHistory ppoolBatchOperationLog = new PPoolsBatchOperationHistory()
+                {
+                    batchOperationID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][0]),
+                    batchOperationCatName = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    batchOperationSourcePPoolID = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][2]),
+                    batchOperationSourcePPoolName = (string)(connectionInfo.resultsDataTable.Rows[i][3]),
+                    batchOperationAction = (string)(connectionInfo.resultsDataTable.Rows[i][4]),
+                    batchOperationDateTime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][5])).ToString(),
+                    batchOperationSourceUserName = (string)(connectionInfo.resultsDataTable.Rows[i][6]),
+                };
+
+                ppoolBatchOperationHistory.Add(ppoolBatchOperationLog);
+            }
+
+            return ppoolBatchOperationHistory;
+        }
+
         public PPoolsOperationHistory DBGetPPoolsOperationLogs(int _targetPpool)
         {
             PPoolsOperationHistory ppoolOperationLogs = new PPoolsOperationHistory
