@@ -6,6 +6,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     {
         //============================PGRID DATA HANDLING METHODS============================//
 
+        #region READ
+
         public PGridFullInfo DBGetPGridFullInfo(int _targetPgridID)
         {
             string sqlCommandText = $"CALL SP_GET_PGRID_FULL_INFO(@targetPgridID, 'CURSOR');" +
@@ -233,5 +235,47 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             return ppoolsInfoList;
         }
+
+        #endregion READ
+
+        #region WRITE
+
+        public int DBCreateNewPGrid(int userID, PGridFullInfo newPGridInfo)
+        {
+            string sqlCommandText = $"CALL SP_CREATE_PGRID(" +
+                $"@pgridName," +
+                $"@pgridReadmeText," +
+                $"@pgridOwnerId," +
+                $"NULL" +
+                $");";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pgridName", Value = newPGridInfo.pgrid_name},
+                new SQL_QUERY_PARAMETER { Name = "pgridReadmeText", Value = newPGridInfo.pgrid_readme_text},
+                new SQL_QUERY_PARAMETER { Name = "pgridOwnerId", Value = userID}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            return connectionInfo.rowsAffected;
+        }
+
+        public int DBDeletePGrid(int userID, int pgrid_id)
+        {
+            string sqlCommandText = $"CALL SP_DELETE_PGRID(" +
+                $"@pgridID," +
+                $"NULL" +
+                $");";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pgridID", Value = pgrid_id}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            return connectionInfo.rowsAffected;
+        }
+
+        #endregion WRITE
     }
 }

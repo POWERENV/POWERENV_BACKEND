@@ -400,7 +400,6 @@ AS $$
         _OPERATION_SUBSCRIBER_USERS_IDS INTEGER ARRAY;
         _NEW_PNODE_OPERATION_ID INTEGER;
         _NEW_GLOBAL_EVENT_ID INTEGER;
-        _NEW_EVENT_CURSOR REFCURSOR := 'CURSOR';
     BEGIN
         WITH operationCatID_CTE AS (
             SELECT OPERATION_CAT_ID AS CAT_ID
@@ -466,17 +465,15 @@ AS $$
             _operationAction,
             _operationDescription,
             _OPERATION_SUBSCRIBER_USERS_IDS,
-            _NEW_EVENT_CURSOR
+             _NEW_GLOBAL_EVENT_ID
         );
-
-        MOVE FIRST FROM _NEW_EVENT_CURSOR;
-        FETCH NEXT FROM _NEW_EVENT_CURSOR INTO _NEW_GLOBAL_EVENT_ID;
-        CLOSE _NEW_EVENT_CURSOR;
 
         CALL SP_INSERT_EVENT_TO_SINGLE_OPERATION_LINK_LOG (
             _NEW_GLOBAL_EVENT_ID,
             _NEW_PNODE_OPERATION_ID
          );
+
+        RAISE NOTICE '%', _NEW_PNODE_OPERATION_ID;
 
         GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
     END;

@@ -1,3 +1,5 @@
+--region read
+
 CREATE OR REPLACE PROCEDURE SP_GET_PGRIDS_LIST (
     _USER_ID INTEGER,
     INOUT result_set REFCURSOR  -- Add an INOUT parameter for the cursor
@@ -22,7 +24,7 @@ BEGIN
         )
         (
             (
-                SELECT PGRIDS.PGRID_ID,
+                SELECT PGRIDS.PGRID_ID AS PGRID_ID,
                        PGRIDS.PGRID_NAME,
                        COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
                        COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT
@@ -34,7 +36,7 @@ BEGIN
             )
             UNION ALL
             (
-                SELECT access_policy_pgrid_id,
+                SELECT access_policy_pgrid_id AS PGRID_ID,
                        PGRIDS.pgrid_name,
                        COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
                        COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT
@@ -44,7 +46,8 @@ BEGIN
                     INNER JOIN PGRIDS ON pgrid_id = pgrid_access_policies.access_policy_pgrid_id
                 WHERE access_policy_target_user_id = _USER_ID
             )
-        );
+        )
+        ORDER BY PGRID_ID;
     END;
 $$;
 
@@ -82,12 +85,12 @@ AS $$
                    PGRIDS.PGRID_LAST_UPDATE_DATETIME,
                    (USERS.USER_FIRST_NAME || ' ' || USERS.USER_LAST_NAME) AS PGRID_OWNER_FULL_NAME,
                    PGRIDS.PGRID_README_TEXT,
-                   COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0),
-                   COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0),
-                   COALESCE(ACTIVE_PNODE_COUNT_CTE.ACTIVE_PNODE_COUNT, 0)
+                   COALESCE(PPOOL_COUNT_CTE.PPOOL_COUNT, 0) AS PPOOL_COUNT,
+                   COALESCE(PNODE_COUNT_CTE.PNODE_COUNT, 0) AS PNODE_COUNT,
+                   COALESCE(ACTIVE_PNODE_COUNT_CTE.ACTIVE_PNODE_COUNT, 0) AS ACTIVE_PNODE_COUNT
             FROM PGRIDS
-                INNER JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
-                INNER JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
+                LEFT JOIN PPOOL_COUNT_CTE ON PPOOL_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
+                LEFT JOIN PNODE_COUNT_CTE ON PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
                 LEFT JOIN ACTIVE_PNODE_COUNT_CTE ON ACTIVE_PNODE_COUNT_CTE.PPOOL_ASSOCIATERD_PGRID_ID = PGRIDS.PGRID_ID
                 INNER JOIN USERS ON USERS.USER_ID = PGRIDS.PGRID_OWNER_ID
             WHERE PGRIDS.PGRID_ID = _targetPgridID;
@@ -242,3 +245,58 @@ AS $$
             ORDER BY PPOOLS.PPOOL_ID ASC;
     END;
 $$;
+
+--endregion read
+
+--region write
+
+CREATE OR REPLACE PROCEDURE SP_CREATE_PGRID (
+    _PGRID_NAME VARCHAR,
+    _PGRID_README_TEXT TEXT,
+    _PGRID_OWNER_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE _CURRENT_TIMEZONE VARCHAR;
+    BEGIN
+        SELECT DEFAULT_TIMEZONE
+        INTO _CURRENT_TIMEZONE
+        FROM VW_DEFAULT_TIMEZONE;
+
+        INSERT INTO PGRIDS (
+            PGRID_NAME,
+            PGRID_CREATION_DATETIME,
+            PGRID_LAST_UPDATE_DATETIME,
+            PGRID_OWNER_ID,
+            PGRID_README_TEXT
+        )
+        VALUES (
+            _PGRID_NAME,
+            NOW() AT TIME ZONE _CURRENT_TIMEZONE,
+            NOW() AT TIME ZONE _CURRENT_TIMEZONE,
+            _PGRID_OWNER_ID,
+            _PGRID_README_TEXT
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_DELETE_PGRID (
+    _PGRID_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE _CURRENT_TIMEZONE VARCHAR;
+    BEGIN
+        DELETE
+        FROM PGRIDS
+        WHERE PGRID_ID = _PGRID_ID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+--endregion write

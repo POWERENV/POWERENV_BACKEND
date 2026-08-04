@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
@@ -128,6 +129,51 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("createNewPGrid")]
+        public IActionResult DBCreateNewPGrid([FromBody] PGridFullInfo newPGridInfo)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPGrid(userID, newPGridInfo);
+
+                response.operationStatus = true;
+                response.statusMessage = "New PGrid successfully created!";
+            }
+            catch(Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"New PGrid creation operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("deletePGrid_{pgrid_id}")]
+        public IActionResult DBDeletePGrid([FromRoute] int pgrid_id)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                string pgridName = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGridFullInfo(pgrid_id).pgrid_name;
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBDeletePGrid(userID, pgrid_id);
+
+                response.operationStatus = true;
+                response.statusMessage = $"PGrid successfully deleted!";
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"PGrid deletion operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
         [HttpGet("pgrid{_pgridID}/ppool{_ppoolID}")]
         public IActionResult DBGetPPoolInsights([FromRoute] int _ppoolID)
         {
@@ -234,7 +280,7 @@ namespace POWERENV_BACKEND_API.Controllers
             catch(Exception error)
             {
                 response.operationStatus = false;
-                response.statusMessage = "PNode Readme updated, but operation log creation failed!!! Error: ${error}";
+                response.statusMessage = $"PNode Readme updated, but operation log creation failed!!! Error: ${error}";
             }
 
             return Ok(response);

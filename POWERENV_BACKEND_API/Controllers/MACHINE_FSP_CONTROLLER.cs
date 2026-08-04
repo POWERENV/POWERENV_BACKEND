@@ -214,7 +214,7 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("{_systemID}/sendASMICommand")]
+        [HttpPost("pnode{_systemID}/sendASMICommand")]
         public IActionResult SendASMICommand([FromRoute] int _systemID, [FromBody] string command)
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
