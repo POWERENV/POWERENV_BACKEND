@@ -304,6 +304,43 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
+        public int DBCreateNewPPool(int userID, PPoolFullInfo newPPoolInfo)
+        {
+            string sqlCommandText = $"CALL SP_CREATE_PPOOL(" +
+                $"@ppoolName," +
+                $"@ppoolTag," +
+                $"@ppoolReadmeText," +
+                $"@ppoolAssociatedPGridID," +
+                $"NULL" +
+                $");";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "ppoolName", Value = newPPoolInfo.ppool_name },
+                new SQL_QUERY_PARAMETER { Name = "ppoolTag", Value = newPPoolInfo.ppool_tag},
+                new SQL_QUERY_PARAMETER { Name = "ppoolReadmeText", Value = newPPoolInfo.ppool_readme_text},
+                new SQL_QUERY_PARAMETER { Name = "ppoolAssociatedPGridID", Value = newPPoolInfo.ppool_parent_pgrid_id}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+            return connectionInfo.rowsAffected;
+        }
+
+        public int DBDeletePPool(int userID, int ppool_id)
+        {
+            string sqlCommandText = $"CALL SP_DELETE_PPOOL(" +
+                $"@ppoolID," +
+                $"NULL" +
+                $");";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "ppoolID", Value = ppool_id}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            return connectionInfo.rowsAffected;
+        }
+
         #endregion WRITE
     }
 }

@@ -683,4 +683,89 @@ AS $$
     END;
 $$;
 
+SELECT * FROM PNODES;
+
+SELECT * FROM PNODE_STATUS;
+
+BEGIN TRANSACTION;
+CALL SP_GET_PNODE_FSP_INFO(1, 'CURSOR');
+FETCH ALL FROM "CURSOR";
+COMMIT;
+
+CREATE TYPE PNODE_BASIC_INFO_TYPE AS
+(
+    NickName VARCHAR,
+    SystemModelName VARCHAR,
+    SystemMachineTypeModel VARCHAR,
+    SystemMachineSerialNumber VARCHAR,
+    SystemPSeries VARCHAR,
+    ParentPPoolID INTEGER,
+    ReadmeText VARCHAR,
+    SerialCOMPort VARCHAR
+);
+
+CREATE TYPE PNODE_FSP_INFO_TYPE AS
+(
+    FSPASMIUsername VARCHAR,
+    FSPASMIPasswordHash VARCHAR,
+    FSPASMIVersion VARCHAR,
+    FSPASMILocalTime VARCHAR
+);
+
+CREATE OR REPLACE PROCEDURE SP_CREATE_PNODE (
+    pnodeBasicInfo PNODE_BASIC_INFO_TYPE,
+    pnodeFSPInfo PNODE_FSP_INFO_TYPE,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE _CURRENT_TIME_ZONE VARCHAR; _NEW_FSP_INFO_RECORD_ID INTEGER;
+    BEGIN
+        SELECT default_timezone
+        INTO _CURRENT_TIME_ZONE
+        FROM vw_default_timezone;
+
+        INSERT INTO PNODES_FSP_INFO (
+            PNODE_FSP_ASMI_VERSION,
+            PNODE_FSP_ASMI_USERNAME,
+            PNODE_FSP_ASMI_PASSWORD_HASH,
+            PNODE_FSP_ASMI_LOCAL_DATETIME
+        )
+        VALUES(
+           pnodeFSPInfo.FSPASMIVersion,
+           pnodeFSPInfo.FSPASMIUsername,
+           pnodeFSPInfo.FSPASMIPasswordHash,
+           pnodeFSPInfo.FSPASMILocalTime::TIMESTAMP AT TIME ZONE _CURRENT_TIME_ZONE
+        )
+        RETURNING PNODE_FSP_ID INTO _NEW_FSP_INFO_RECORD_ID;
+
+        INSERT INTO PNODES (
+            PNODE_NICKNAME,
+            PNODE_SYSTEM_MODEL_NAME,
+            PNODE_MACHINE_TYPE_MODEL,
+            PNODE_MACHINE_SERIAL_NUMBER,
+            PNODE_SYSTEM_PSERIES,
+            PNODE_FSP_ID,
+            PNODE_STATUS_ID,
+            PNODE_ASSOCIATED_PPOOL_ID,
+            PNODE_README_TEXT,
+            PNODE_SERIAL_COM_PORT
+        )
+        VALUES (
+            pnodeBasicInfo.NickName,
+            pnodeBasicInfo.SystemModelName,
+            pnodeBasicInfo.SystemMachineTypeModel,
+            pnodeBasicInfo.SystemMachineSerialNumber,
+            pnodeBasicInfo.SystemPSeries,
+            _NEW_FSP_INFO_RECORD_ID,
+            2,
+            pnodeBasicInfo.ParentPPoolID,
+            pnodeBasicInfo.ReadmeText,
+            pnodeBasicInfo.SerialCOMPort
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
 --endregion

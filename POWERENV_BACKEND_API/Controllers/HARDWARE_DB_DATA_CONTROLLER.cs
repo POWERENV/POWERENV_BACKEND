@@ -203,6 +203,51 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("createNewPPool")]
+        public IActionResult DBCreateNewPPool([FromBody] PPoolFullInfo newPPoolInfo)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPPool(userID, newPPoolInfo);
+
+                response.operationStatus = true;
+                response.statusMessage = "New PPool successfully created!";
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"New PPool creation operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
+        [HttpGet("deletePPool_{ppool_id}")]
+        public IActionResult DBDeletePPool([FromRoute] int ppool_id)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                string ppoolName = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolFullInfo(ppool_id).ppool_name;
+                int newPPoolRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBDeletePPool(userID, ppool_id);
+
+                response.operationStatus = true;
+                response.statusMessage = $"PPool successfully deleted!";
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"PPool deletion operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost("ppool{_ppoolID}/changeReadme")]
         public IActionResult DBPPoolEditReadmeText([FromRoute] int _ppoolID, [FromBody] string newReadmeText)
         {

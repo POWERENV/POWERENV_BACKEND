@@ -112,6 +112,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             public int ppool_id { get; set; }
             public string ppool_name { get; set; }
             public string ppool_tag { get; set; }
+            public int ppool_parent_pgrid_id { get; set; }
             public string ppool_parent_pgrid_name { get; set; }
             public string ppool_creation_datetime { get; set; }
             public string ppool_last_update_datetime { get; set; }

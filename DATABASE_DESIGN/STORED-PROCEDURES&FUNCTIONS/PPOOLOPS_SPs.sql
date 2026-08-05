@@ -265,4 +265,56 @@ AS $$
     END;
 $$;
 
+CREATE OR REPLACE PROCEDURE SP_CREATE_PPOOL (
+    _PPOOL_NAME VARCHAR,
+    _PPOOL_TAG VARCHAR,
+    _PPOOL_README_TEXT TEXT,
+    _PPOOL_PGRID_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE _CURRENT_TIMEZONE VARCHAR;
+    BEGIN
+        SELECT DEFAULT_TIMEZONE
+        INTO _CURRENT_TIMEZONE
+        FROM VW_DEFAULT_TIMEZONE;
+
+        INSERT INTO PPOOLS (
+            PPOOL_NAME,
+            PPOOL_TAG,
+            PPOOL_CREATION_DATETIME,
+            PPOOL_LAST_UPDATE_DATETIME,
+            PPOOL_ASSOCIATERD_PGRID_ID,
+            PPOOL_README_TEXT
+        )
+        VALUES (
+            _PPOOL_NAME,
+            _PPOOL_TAG,
+            NOW() AT TIME ZONE _CURRENT_TIMEZONE,
+            NOW() AT TIME ZONE _CURRENT_TIMEZONE,
+            _PPOOL_PGRID_ID,
+            _PPOOL_README_TEXT
+        );
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
+CREATE OR REPLACE PROCEDURE SP_DELETE_PPOOL (
+    _PPOOL_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        DELETE
+        FROM PPOOLS
+        WHERE PPOOL_ID = _PPOOL_ID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
 --endregion
