@@ -136,7 +136,7 @@ namespace POWERENV_OSCONSOLE_WORKER
                                 await db.ListSetByIndexAsync("osSessionQueue", i, JsonSerializer.Serialize(sessionInfo));
 
                                 await db.StreamAddAsync(
-                                    "terminal-output",   // stream key
+                                    "terminal-output",
                                     new NameValueEntry[]
                                     {
                                         new("targetSession", sessionInfo.WSSListenerConnectionID),
