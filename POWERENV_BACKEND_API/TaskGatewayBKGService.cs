@@ -87,13 +87,13 @@ namespace POWERENV_BACKEND_API
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (checkRedisStreamExistance(redisTerminalOutputStream))
+                if (!checkRedisStreamExistance(redisTerminalOutputStream))
                 {
                     await Task.Delay(100, stoppingToken);
                     continue;
                 }
 
-                if (checkRedisConsumerGroupExistance(redisTerminalOutputStream, redisAPIReaderConsumerGroup))
+                if (!checkRedisConsumerGroupExistance(redisTerminalOutputStream, redisAPIReaderConsumerGroup))
                 {
                     await Task.Delay(100, stoppingToken);
                     continue;
