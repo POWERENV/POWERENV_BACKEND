@@ -14,35 +14,35 @@ namespace POWERENV_BACKEND_API.Controllers
     {
         private record PGridInsights
         {
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessPolicyInfo> accessPolicies { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessAuditInfo> accessAudits { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodesLoginAudits { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodesErrorLogs { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> attentionLEDMarkedPNodes { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsList> ppoolsInfoList { get; set; }
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PGridFullInfo pgridFullInfo { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessPolicyInfo> accessPolicies { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessAuditInfo> accessAudits { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodesLoginAudits { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodesErrorLogs { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> attentionLEDMarkedPNodes { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsList> ppoolsInfoList { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PGridFullInfo pgridFullInfo { get; set; }
         }
 
         private record PPoolInsights
         {
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesBasicInfo> ppoolPNodesFullList { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> ppoolLoginAudits { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> ppoolAttentionLEDMarkedPNodes { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs { get; set; }
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsOperationHistory ppoolOperationLogs { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesBasicInfo> ppoolPNodesFullList { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> ppoolLoginAudits { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> ppoolAttentionLEDMarkedPNodes { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsOperationHistory ppoolOperationLogs { get; set; }
         }
 
         private record PNodeInsights
         {
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFullInfo pnode_full_info { get; set; }
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFSPInfo pnodeFSPInfo { get; set; }
-            public PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeMachineInfo pnodeMachineInfo { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeNICInfo> pnodeNICInfo { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodeLoginAudits { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesSingleOperationHistory> pnodeSingleOperationHistory { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodeErrorLogs { get; set; }
-            public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeETHAccessPolicyInfo> pnodeETHAccessPolicies { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFullInfo pnode_full_info { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFSPInfo pnodeFSPInfo { get; set; }
+            public required PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeMachineInfo pnodeMachineInfo { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeNICInfo> pnodeNICInfo { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodeLoginAudits { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesSingleOperationHistory> pnodeSingleOperationHistory { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodeErrorLogs { get; set; }
+            public required List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeETHAccessPolicyInfo> pnodeETHAccessPolicies { get; set; }
         }
 
         public record NewPNodeMachineSyncCredentials
@@ -70,7 +70,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
             if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId))
             {
-                List<PSYSTEMS_HARDWARE_DATA_HANDLING.GlobalEvent> recentActivityInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetRecentActivity(userId);
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.GlobalEvent> recentActivityInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetRecentActivity(userId);
 
                 response.operationStatus = true;
                 response.statusMessage = "Recent activity data successfully received!";
@@ -94,7 +94,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
             if (int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId))
             {
-                List<PSYSTEMS_HARDWARE_DATA_HANDLING.PGridBasicInfo> pgridsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGrids(userId);
+                List<PSYSTEMS_HARDWARE_DATA_HANDLING.PGridBasicInfo> pgridsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGrids(userId);
 
                 response.operationStatus = true;
                 response.statusMessage = "PGrid Dashboard data successfully received!";
@@ -114,13 +114,13 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessPolicyInfo> accessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGAccessPolicies(_pgridID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessAuditInfo> accessAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGAccessAudits(_pgridID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodesLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGPNLoginAudits(_pgridID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodesErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGErrorLogs(_pgridID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> attentionLEDMarkedPNodes = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetAttentionLEDPNodes(_pgridID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsList> ppoolsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGPPoolsList(_pgridID);
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PGridFullInfo pgridFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGridFullInfo(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessPolicyInfo> accessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGAccessPolicies(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AccessAuditInfo> accessAudits = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGAccessAudits(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodesLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGPNLoginAudits(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodesErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGErrorLogs(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> attentionLEDMarkedPNodes = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetAttentionLEDPNodes(_pgridID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsList> ppoolsInfoList = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGPPoolsList(_pgridID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PGridFullInfo pgridFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGridFullInfo(_pgridID);
 
             PGridInsights pgridInsights = new PGridInsights()
             {
@@ -148,7 +148,7 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPGrid(userID, newPGridInfo);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBCreateNewPGrid(userID, newPGridInfo);
 
                 response.operationStatus = true;
                 response.statusMessage = "New PGrid successfully created!";
@@ -170,8 +170,8 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                string pgridName = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGridFullInfo(pgrid_id).pgrid_name;
-                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBDeletePGrid(userID, pgrid_id);
+                string pgridName = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGridFullInfo(pgrid_id).pgrid_name!;
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBDeletePGrid(userID, pgrid_id);
 
                 response.operationStatus = true;
                 response.statusMessage = $"PGrid successfully deleted!";
@@ -190,12 +190,12 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesBasicInfo> ppoolPNodesList = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPGPPoolPNodesList(_ppoolID);
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolFullInfo(_ppoolID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> ppoolLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsLoginAudits(_ppoolID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> ppoolAttentionLEDMarkedPNodes = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolAttentionLEDPNodes(_ppoolID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsErrorLogs(_ppoolID);
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsOperationHistory ppoolOperationLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsOperationLogs(_ppoolID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesBasicInfo> ppoolPNodesList = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPGPPoolPNodesList(_ppoolID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolFullInfo(_ppoolID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> ppoolLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolsLoginAudits(_ppoolID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> ppoolAttentionLEDMarkedPNodes = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolAttentionLEDPNodes(_ppoolID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolsErrorLogs(_ppoolID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsOperationHistory ppoolOperationLogs = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolsOperationLogs(_ppoolID);
 
             PPoolInsights ppoolInsights = new PPoolInsights()
             {
@@ -222,7 +222,7 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPPool(userID, newPPoolInfo);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBCreateNewPPool(userID, newPPoolInfo);
 
                 response.operationStatus = true;
                 response.statusMessage = "New PPool successfully created!";
@@ -244,8 +244,8 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                string ppoolName = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolFullInfo(ppool_id).ppool_name;
-                int newPPoolRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBDeletePPool(userID, ppool_id);
+                string ppoolName = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPPoolFullInfo(ppool_id).ppool_name!;
+                int newPPoolRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBDeletePPool(userID, ppool_id);
 
                 response.operationStatus = true;
                 response.statusMessage = $"PPool successfully deleted!";
@@ -264,7 +264,7 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            int readmeTextRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBPPoolEditReadme(_ppoolID, newReadmeText);
+            int readmeTextRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBPPoolEditReadme(_ppoolID, newReadmeText);
 
             response.operationStatus = true;
             response.statusMessage = "PPool Readme successfully received!";
@@ -277,14 +277,14 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFullInfo pnodeFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_pnodeID);
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFSPInfo pnodeFSPInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFSPInfo(_pnodeID);
-            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeMachineInfo pnodeMachineInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMachineInfo(_pnodeID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeNICInfo> pnodeNICInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeNICsInfo(_pnodeID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodeLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesLoginAudits(_pnodeID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesSingleOperationHistory> pnodeSingleOperationHistory = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeOperationLogs(_pnodeID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodeErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodesErrorLogs(_pnodeID);
-            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeETHAccessPolicyInfo> pnodeETHAccessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeETHAccessPolicies(_pnodeID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFullInfo pnodeFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeFullInfo(_pnodeID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeFSPInfo pnodeFSPInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeFSPInfo(_pnodeID);
+            PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeMachineInfo pnodeMachineInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeMachineInfo(_pnodeID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeNICInfo> pnodeNICInfo = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeNICsInfo(_pnodeID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> pnodeLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodesLoginAudits(_pnodeID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodesSingleOperationHistory> pnodeSingleOperationHistory = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeOperationLogs(_pnodeID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> pnodeErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodesErrorLogs(_pnodeID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeETHAccessPolicyInfo> pnodeETHAccessPolicies = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeETHAccessPolicies(_pnodeID);
 
             PNodeInsights ppoolInsights = new PNodeInsights()
             {
@@ -349,7 +349,7 @@ namespace POWERENV_BACKEND_API.Controllers
             try
             {
                 int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPNode(userID, pnodeInfo.pnodeBasicInfo, pnodeInfo.pnodeFSPInfo, pnodeInfo.pnodeOSUserInfoType);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBCreateNewPNode(userID, pnodeInfo.pnodeBasicInfo, pnodeInfo.pnodeFSPInfo, pnodeInfo.pnodeOSUserInfoType);
 
                 response.operationStatus = true;
                 response.statusMessage = "New PNode successfully created!";
@@ -368,12 +368,12 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
 
-            int readmeTextRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBPNodeEditReadme(_pnodeID, newReadmeText);
+            int readmeTextRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBPNodeEditReadme(_pnodeID, newReadmeText);
 
             try
             {
-                string userName = User.FindFirst(ClaimTypes.Name)?.Value;
-                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_pnodeID).pnode_nickname;
+                string userName = User.FindFirst(ClaimTypes.Name)?.Value!;
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeFullInfo(_pnodeID).pnode_nickname!;
 
                 PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory
                 {

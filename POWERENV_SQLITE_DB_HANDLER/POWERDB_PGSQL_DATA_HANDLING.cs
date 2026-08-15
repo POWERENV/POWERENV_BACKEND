@@ -19,48 +19,35 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     /// </summary>
     public class POWERDB_PGSQL_DATA_HANDLING : IDB_DATA_HANDLING
     {
-        //private static POWERDB_PGSQL_DATA_HANDLING autoInstance;
-        private NpgsqlDataSource connectionDataSource;
-        private PSYSTEMS_HARDWARE_DATA_HANDLING hardwareDataHandler;
-        private USER_DATA_HANDLING userDataHandler;
+        private NpgsqlDataSource? connectionDataSource;
+        private PSYSTEMS_HARDWARE_DATA_HANDLING? hardwareDataHandler;
+        private USER_DATA_HANDLING? userDataHandler;
 
         /// <summary>
-        /// Property for the actual POWERENV data interaction methods class.
+        /// Property for the POWERENV's hardware-related data handling methods class.
         /// </summary>
-        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER
+        public PSYSTEMS_HARDWARE_DATA_HANDLING? HARDWARE_DATA_HANDLER
         {
             get => hardwareDataHandler;
             set => hardwareDataHandler = value;
         }
 
         /// <summary>
-        /// Property for the actual POWERENV data interaction methods class.
+        /// Property for the POWERENV's user-related data handling methods class.
         /// </summary>
-        public USER_DATA_HANDLING USER_DATA_HANDLER
+        public USER_DATA_HANDLING? USER_DATA_HANDLER
         {
             get => userDataHandler;
             set => userDataHandler = value;
         }
-        /*public static NpgsqlDataSource ConnectionDataSource {
-            get {
-                if(autoInstance != null) return autoInstance.connectionDataSource;
-                return null;
-            }
-            set {
-                if (autoInstance != null) autoInstance.connectionDataSource = value;
-            }
-        }*/
 
-        public NpgsqlDataSource ConnectionDataSource
+        /// <summary>
+        /// Property holding useful context data for new DB query connections from the backend.
+        /// </summary>
+        public NpgsqlDataSource? ConnectionDataSource
         {
-            get
-            {
-                return connectionDataSource;
-            }
-            set
-            {
-                connectionDataSource = value;
-            }
+            get => connectionDataSource;
+            set => connectionDataSource = value;
         }
 
         /// <summary>
@@ -69,7 +56,6 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="dataSourceDirPath"></param>
         public POWERDB_PGSQL_DATA_HANDLING(string dataSourceDirPath, bool initializeAutoInstance = true)
         {
-            //if (initializeAutoInstance) autoInstance = new POWERDB_PGSQL_DATA_HANDLING(dataSourceDirPath, false);
             HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath, this);
             USER_DATA_HANDLER = new USER_DATA_HANDLING(dataSourceDirPath, this);
         }
@@ -86,6 +72,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <returns>ICONNECTION_INFO packet object.</returns>
         public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor)
         {
+            if (ConnectionDataSource == null) throw new Exception("ConnectionDataSourceUnassignedException: Database connection context object unassigned!");
+
             DataTable resultDataTable = new DataTable();
             PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO()
             {
@@ -97,11 +85,12 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             try
             {
-                var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+                NpgsqlCommand cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                    NpgsqlParameter param = cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value ?? "NULL");
+                    if (parameters[i].SQLType != null) param.DataTypeName = parameters[i].SQLType;
                 }
 
                 connectionInfo.reader = cmd.ExecuteReader();
@@ -114,7 +103,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 transaction.Commit();
                 connectionInfo.conn.Close();
             }
-            catch (Exception ex)
+            catch
             {
                 if (connectionInfo.reader != null && !connectionInfo.reader.IsClosed) connectionInfo.reader.Close();
 
@@ -136,6 +125,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// </summary>
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
+        /// <param name="hasCursor"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
         internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
         {
@@ -148,6 +138,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <param name="parameters"></param>
+        /// <param name="hasCursor"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
         internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor = false)
         {
@@ -163,6 +154,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <returns>ICONNECTION_INFO packet object.</returns>
         public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure)
         {
+            if (ConnectionDataSource == null) throw new Exception("ConnectionDataSourceUnassignedException: Database connection context object unassigned!");
+
             PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO()
             {
                 conn = ConnectionDataSource.CreateConnection()
@@ -173,20 +166,12 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             try
             {
-                var cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
+                NpgsqlCommand cmd = new NpgsqlCommand(_sqlCommandText, connectionInfo.conn);
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    var param = cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                    NpgsqlParameter param = cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value ?? "NULL");
                     if (parameters[i].SQLType != null) param.DataTypeName = parameters[i].SQLType;
-                }
-
-                // "DataTypes" returns a DataTable containing all types cached by the driver
-                DataTable dataTypesTable = connectionInfo.conn.GetSchema("DataTypes");
-
-                foreach (DataRow row in dataTypesTable.Rows)
-                {
-                    Console.WriteLine($"Type Name: {row["TypeName"]} | OID: {row["ProviderDbType"]}");
                 }
 
                 if (isStoredProcedure)
@@ -212,7 +197,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 transaction.Commit();
                 connectionInfo.conn.Close();
             }
-            catch (Exception ex)
+            catch
             {
                 if (connectionInfo.reader != null && !connectionInfo.reader.IsClosed) connectionInfo.reader.Close();
 
@@ -230,10 +215,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         }
 
         /// <summary>
-        /// Static reference method to write data on PostgreSQL database, returning a PGSQL_DB_CONNECTION_INFO object containing the connection object and the number of rows affected by the command.
+        /// PGSQL_DB_CONNECTION_INFO wrapper method to write data on PostgreSQL database, returning a PGSQL_DB_CONNECTION_INFO object containing the connection object and the number of rows affected by the command.
         /// </summary>
-        /// <param name="_connectionString"></param>
-        /// <param name="_sqlCommandText"></param>
+        /// <param name="_connectionString">String required for establishing connection with the DB.</param>
+        /// <param name="_sqlCommandText">The SQL write query code string.</param>
+        /// <param name="isStoredProcedure">Flag defining method behaviour depending on Stored Procedure calls existance inside the query string.<para>Holds true if the query is a just a stored procedure call (eg: "CALL SP_TEST(@param1, @param2, NULL);")</para></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
         internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = true)
         {
@@ -241,15 +227,33 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         }
 
         /// <summary>
-        /// Static reference method to write data on PostgreSQL database, returning a PGSQL_DB_CONNECTION_INFO object containing the connection object and the number of rows affected by the command.
+        /// PGSQL_DB_CONNECTION_INFO wrapper method to write data on PostgreSQL database replacing query parameters by the indicated values, and returning a PGSQL_DB_CONNECTION_INFO object containing the connection object and the number of rows affected by the command.
         /// </summary>
-        /// <param name="_connectionString"></param>
-        /// <param name="_sqlCommandText"></param>
-        /// <param name="parameters"></param>
+        /// <param name="_connectionString">String required for establishing connection with the DB.</param>
+        /// <param name="_sqlCommandText">The SQL write query code string.</param>
+        /// <param name="parameters">Parameters passed into _sqlCommandText.</param>
+        /// <param name="isStoredProcedure">Flag defining method behaviour depending on Stored Procedure calls existance inside the query string.<para>Holds true if the query is a just a stored procedure call (eg: "CALL SP_TEST(@param1, @param2, NULL);")</para></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
         internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure = true)
         {
             return (PGSQL_DB_CONNECTION_INFO)intWriteDataOnDB(_connectionString, _sqlCommandText, parameters, isStoredProcedure);
+        }
+
+        /// <summary>
+        /// Retrieves all PostgreSQL datatypes loaded into the connection context.
+        /// </summary>
+        /// <param name="connectionObject">NpgsqlConnection object holding the connection into PostgreSQL DB.</param>
+        /// <returns>A datatable with the requested loaded datatypes.</returns>
+        private DataTable GetPGSQLDrivedCachedDataTypes(NpgsqlConnection connectionObject)
+        {
+            DataTable dataTypesTable = connectionObject.GetSchema("DataTypes");
+
+            foreach (DataRow row in dataTypesTable.Rows)
+            {
+                Console.WriteLine($"Type Name: {row["TypeName"]} | OID: {row["ProviderDbType"]}");
+            }
+
+            return dataTypesTable;
         }
     }
 }

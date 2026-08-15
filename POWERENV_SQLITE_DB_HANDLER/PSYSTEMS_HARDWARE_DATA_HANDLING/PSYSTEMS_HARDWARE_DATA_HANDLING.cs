@@ -12,41 +12,41 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public record AccessPolicyInfo
         {
-            public int access_policy_id { get; set; }
-            public string access_policy_name { get; set; }
-            public string access_policy_pgrid_name { get; set; }
-            public string access_policy_target_username { get; set; }
-            public string access_policy_creation_datetime { get; set; }
-            public string access_policy_last_update_datetime { get; set; }
-            public string access_policy_permission_level { get; set; }
+            public required int access_policy_id { get; set; }
+            public required string access_policy_name { get; set; }
+            public required string access_policy_pgrid_name { get; set; }
+            public required string access_policy_target_username { get; set; }
+            public required string access_policy_creation_datetime { get; set; }
+            public required string access_policy_last_update_datetime { get; set; }
+            public required string access_policy_permission_level { get; set; }
         };
 
         public record AccessAuditInfo
         {
-            public int access_audit_id { get; set; }
-            public string access_audit_datetime { get; set; }
-            public string access_audit_performed_by_username { get; set; }
-            public string access_audit_target_pgrid_name { get; set; }
+            public required int access_audit_id { get; set; }
+            public required string access_audit_datetime { get; set; }
+            public required string access_audit_performed_by_username { get; set; }
+            public required string access_audit_target_pgrid_name { get; set; }
         };
 
         public record NodesLoginAudits
         {
             public int login_audit_id { get; set; }
-            public string login_audit_fsp_user { get; set; }
-            public string login_audit_datetime { get; set; }
-            public string login_audit_login_status { get; set; }
-            public string login_audit_location { get; set; }
-            public string login_audit_pnode_nickname { get; set; }
-            public string login_audit_pnode_ppool_name { get; set; }
+            public string? login_audit_fsp_user { get; set; }
+            public string? login_audit_datetime { get; set; }
+            public string? login_audit_login_status { get; set; }
+            public string? login_audit_location { get; set; }
+            public string? login_audit_pnode_nickname { get; set; }
+            public string? login_audit_pnode_ppool_name { get; set; }
         }
 
         public record FSPErrorLogFRUInfo
         {
-            public string Priority { get; set; }
-            public string LocationCode { get; set; }
-            public string PartNumber { get; set; }
-            public string CCIN { get; set; }
-            public string SerialNumber { get; set; }
+            public required string Priority { get; set; }
+            public required string LocationCode { get; set; }
+            public required string PartNumber { get; set; }
+            public required string CCIN { get; set; }
+            public required string SerialNumber { get; set; }
         };
 
         public record FSPErrorLogInfo
@@ -68,46 +68,46 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public record AttentionLEDPNodesInfo
         {
-            public string pnode_nickname { get; set; }
-            public string ppool_name { get; set; }
+            public required string pnode_nickname { get; set; }
+            public required string ppool_name { get; set; }
         };
 
         public record PPoolsList
         {
-            public int ppoolID { get; set; }
-            public string ppool_name { get; set; }
-            public int ppoolPnodesCount { get; set; }
-            public List<PNodesBasicInfo> pnodesList { get; set; }
+            public required int ppoolID { get; set; }
+            public required string ppool_name { get; set; }
+            public required int ppoolPnodesCount { get; set; }
+            public required List<PNodesBasicInfo> pnodesList { get; set; }
         };
 
         public record PNodesBasicInfo
         {
-            public int pnodeID { get; set; }
-            public string pnodeName { get; set; }
-            public int pnodeLparsCount { get; set; }
+            public required int pnodeID { get; set; }
+            public required string pnodeName { get; set; }
+            public required int pnodeLparsCount { get; set; }
         };
 
         public record PNodesBasicInfoPGSQLCompositeType
         {
-            [PgName("pnodeid")] public int PNodeID { get; set; }
-            [PgName("nickname")] public string NickName { get; set; }
-            [PgName("systemmodelname")] public string SystemModelName { get; set; }
-            [PgName("systemmachinetypemodel")] public string SystemMachineTypeModel { get; set; }
-            [PgName("systemmachineserialnumber")]  public string SystemMachineSerialNumber { get; set; }
-            [PgName("systempseries")]  public string SystemPSeries { get; set; }
-            [PgName("parentppoolid")] public int ParentPPoolID { get; set; }
-            [PgName("readmetext")]  public string ReadmeText { get; set; }
-            [PgName("serialcomport")] public string SerialCOMPort { get; set; }
+            [PgName("pnodeid")] public required int PNodeID { get; set; }
+            [PgName("nickname")] public required string NickName { get; set; }
+            [PgName("systemmodelname")] public required string SystemModelName { get; set; }
+            [PgName("systemmachinetypemodel")] public required string SystemMachineTypeModel { get; set; }
+            [PgName("systemmachineserialnumber")] public required string SystemMachineSerialNumber { get; set; }
+            [PgName("systempseries")]  public required string SystemPSeries { get; set; }
+            [PgName("parentppoolid")] public required int ParentPPoolID { get; set; }
+            [PgName("readmetext")]  public required string ReadmeText { get; set; }
+            [PgName("serialcomport")] public required string SerialCOMPort { get; set; }
         };
 
         public record PGridFullInfo
         {
-            public string pgrid_id { get; set; }
-            public string pgrid_name { get; set; }
-            public string pgrid_creation_datetime { get; set; }
-            public string pgrid_last_update_datetime { get; set; }
-            public string pgrid_owner { get; set; }
-            public string pgrid_readme_text { get; set; }
+            public string? pgrid_id { get; set; }
+            public string? pgrid_name { get; set; }
+            public string? pgrid_creation_datetime { get; set; }
+            public string? pgrid_last_update_datetime { get; set; }
+            public string? pgrid_owner { get; set; }
+            public string? pgrid_readme_text { get; set; }
             public int pgrid_ppools_count { get; set; }
             public int pgrid_pnodes_count { get; set; }
             public int pgrid_active_pnodes_count { get; set; }
@@ -124,13 +124,13 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public record PPoolFullInfo
         {
             public int ppool_id { get; set; }
-            public string ppool_name { get; set; }
-            public string ppool_tag { get; set; }
+            public string? ppool_name { get; set; }
+            public string? ppool_tag { get; set; }
             public int ppool_parent_pgrid_id { get; set; }
-            public string ppool_parent_pgrid_name { get; set; }
-            public string ppool_creation_datetime { get; set; }
-            public string ppool_last_update_datetime { get; set; }
-            public string ppool_readme_text { get; set; }
+            public string? ppool_parent_pgrid_name { get; set; }
+            public string? ppool_creation_datetime { get; set; }
+            public string? ppool_last_update_datetime { get; set; }
+            public string? ppool_readme_text { get; set; }
             public int ppool_pnodes_count { get; set; }
             public int ppool_active_pnodes_count { get; set; }
         };
@@ -154,52 +154,52 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public record PPoolsBatchOperationHistory
         {
             public int batchOperationID { get; set; }
-            public string batchOperationCatName { get; set; }
+            public string? batchOperationCatName { get; set; }
             public int batchOperationSourcePPoolID { get; set; }
-            public string batchOperationSourcePPoolName { get; set; }
-            public string batchOperationAction { get; set; }
-            public string batchOperationDateTime { get; set; }
-            public string batchOperationSourceUserName { get; set; }
+            public string? batchOperationSourcePPoolName { get; set; }
+            public string? batchOperationAction { get; set; }
+            public string? batchOperationDateTime { get; set; }
+            public string? batchOperationSourceUserName { get; set; }
         };
 
         public record PPoolsOperationHistory
         {
-            public List<PNodesSingleOperationHistory> pnodesSingleOperationHistory { get; set; }
-            public List<PPoolsBatchOperationHistory> ppoolsBatchOperationHistory { get; set; }
+            public required List<PNodesSingleOperationHistory> pnodesSingleOperationHistory { get; set; }
+            public required List<PPoolsBatchOperationHistory> ppoolsBatchOperationHistory { get; set; }
         };
 
         public record PNodeMachineInfo
         {
-            public string pnode_system_model_name { get; set; }
-            public string pnode_machine_type_model { get; set; }
-            public string pnode_machine_serial_number { get; set; }
-            public string pnode_system_pseries { get; set; }
+            public required string pnode_system_model_name { get; set; }
+            public required string pnode_machine_type_model { get; set; }
+            public required string pnode_machine_serial_number { get; set; }
+            public required string pnode_system_pseries { get; set; }
         };
 
         public record PNodeFSPInfo
         {
             [PgName("fspid")] public int FSPID { get; set; }
-            [PgName("fspasmiusername")] public string FSPASMIUsername { get; set; }
-            [PgName("fspasmipasswordhash")] public string FSPASMIPasswordHash { get; set; }
-            [PgName("fspasmiversion")] public string FSPASMIVersion { get; set; }
-            [PgName("fspasmilocaltime")] public string FSPASMILocalTime { get; set; }
+            [PgName("fspasmiusername")] public required string FSPASMIUsername { get; set; }
+            [PgName("fspasmipasswordhash")] public required string FSPASMIPasswordHash { get; set; }
+            [PgName("fspasmiversion")] public required string FSPASMIVersion { get; set; }
+            [PgName("fspasmilocaltime")] public required string FSPASMILocalTime { get; set; }
         };
 
         public record PNodeNICInfo
         {
             public int pnode_nic_id { get; set; }
-            public string pnode_nic_name { get; set; }
-            public string pnode_nic_mac_address { get; set; }
-            public string pnode_nic_ip_address { get; set; }
-            public string pnode_nic_ip_address_type { get; set; }
-            public string pnode_nic_subnet_mask { get; set; }
-            public string pnode_nic_default_gateway { get; set; }
-            public string pnode_nic_hostname { get; set; }
-            public string pnode_nic_domain_name { get; set; }
-            public string pnode_nic_first_dns_ip_address { get; set; }
-            public string pnode_nic_second_dns_ip_address { get; set; }
-            public string pnode_nic_third_dns_ip_address { get; set; }
-            public string pnode_nic_type { get; set; }
+            public string? pnode_nic_name { get; set; }
+            public string? pnode_nic_mac_address { get; set; }
+            public string? pnode_nic_ip_address { get; set; }
+            public string? pnode_nic_ip_address_type { get; set; }
+            public string? pnode_nic_subnet_mask { get; set; }
+            public string? pnode_nic_default_gateway { get; set; }
+            public string? pnode_nic_hostname { get; set; }
+            public string? pnode_nic_domain_name { get; set; }
+            public string? pnode_nic_first_dns_ip_address { get; set; }
+            public string? pnode_nic_second_dns_ip_address { get; set; }
+            public string? pnode_nic_third_dns_ip_address { get; set; }
+            public string? pnode_nic_type { get; set; }
             public int pnode_id { get; set; }
         };
 
@@ -208,45 +208,45 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             public int access_policy_id { get; set; }
             public int access_policy_pnode_id { get; set; }
             public int access_policy_index_id { get; set; }
-            public string access_policy_ip_address { get; set; }
-            public string access_policy_type { get; set; }
+            public required string access_policy_ip_address { get; set; }
+            public required string access_policy_type { get; set; }
         };
 
         public record PNodeFullInfo
         {
             public int pnode_id { get; set; }
-            public string pnode_nickname { get; set; }
-            public string pnode_parent_ppool_name { get; set; }
-            public string pnode_config_datetime { get; set; }
-            public string pnode_last_update_datetime { get; set; }
-            public List<PNodeNICInfo> pnode_nics_info { get; set; }
-            public string pnode_last_heartbeat_datetime { get; set; }
-            public string pnode_attention_led_state { get; set; }
-            public string pnode_readme_text { get; set; }
+            public string? pnode_nickname { get; set; }
+            public string? pnode_parent_ppool_name { get; set; }
+            public string? pnode_config_datetime { get; set; }
+            public string? pnode_last_update_datetime { get; set; }
+            public List<PNodeNICInfo>? pnode_nics_info { get; set; }
+            public string? pnode_last_heartbeat_datetime { get; set; }
+            public string? pnode_attention_led_state { get; set; }
+            public string? pnode_readme_text { get; set; }
             public bool pnodeActivenessState { get; set; }
-            public string pnodeSerialCOMPortId { get; set; }
+            public string? pnodeSerialCOMPortId { get; set; }
         }
 
         public record LPARBasicInfo
         {
-            public int lpar_id { get; set; }
-            public string lpar_name { get; set; }
-            public int lpar_os_instance { get; set; }
-            public bool is_main_os_host { get; set; }
-            public int lpar_storage_size { get; set; }
+            public required int lpar_id { get; set; }
+            public required string lpar_name { get; set; }
+            public required int lpar_os_instance { get; set; }
+            public required bool is_main_os_host { get; set; }
+            public required int lpar_storage_size { get; set; }
         };
 
         public record LPARFullInfo
         {
             public int lpar_id { get; set; }
-            public string lpar_name { get; set; }
+            public required string lpar_name { get; set; }
             public bool is_main_os_host { get; set; }
             public int lpar_storage_size { get; set; }
             public int lpar_target_pnode_id { get; set; }
             public int os_id { get; set; }
-            public AuthInfo osAuthInfo { get; set; }
-            public string os_ip_address { get; set; }
-            public string os_family { get; set; }
+            public AuthInfo? osAuthInfo { get; set; }
+            public string? os_ip_address { get; set; }
+            public string? os_family { get; set; }
         };
 
         public record AuthInfo
@@ -266,11 +266,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public record OSUserInfoPGSQLCompositeType
         {
-            [PgName("osid")] public int OSID { get; set; }
-            [PgName("osusername")] public string OSUsername { get; set; }
-            [PgName("ospasswordhash")] public string OSPasswordHash { get; set; }
-            [PgName("osipaddress")] public string OSIPAddress { get; set; }
-            [PgName("osfamily")] public string OSFamily { get; set; }
+            [PgName("osid")] public required int OSID { get; set; }
+            [PgName("osusername")] public required string OSUsername { get; set; }
+            [PgName("ospasswordhash")] public required string OSPasswordHash { get; set; }
+            [PgName("osipaddress")] public required string OSIPAddress { get; set; }
+            [PgName("osfamily")] public required string OSFamily { get; set; }
         };
 
         public record OSConnSessionInfo
@@ -284,11 +284,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public record GlobalEvent
         {
             public int GlobalEventId { get; set; }
-            public string GlobalEventSeverityLevel { get; set; }
-            public string GlobalEventTitle { get; set; }
-            public string GlobalEventDescription { get; set; }
+            public string? GlobalEventSeverityLevel { get; set; }
+            public string? GlobalEventTitle { get; set; }
+            public string? GlobalEventDescription { get; set; }
             public DateTime GlobalEventTriggeredAt { get; set; }
-            public string NotificationTargetUsername { get; set; }
+            public string? NotificationTargetUsername { get; set; }
             public DateTime NotificationAcknowledgementTimestamp { get; set; }
             public DateTime NotificationResolvedTimestamp { get; set; }
         }
@@ -325,9 +325,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public PSYSTEMS_HARDWARE_DATA_HANDLING(string dataSourceDirPath, POWERDB_PGSQL_DATA_HANDLING _parentDBHandler)
         {
             PARENT_DB_HANDLER = _parentDBHandler;
-            string DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
-            string DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
-            string DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
+            string? DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
+            string? DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
+            string? DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
 
             if (DBPassword != null)
             {
@@ -359,7 +359,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<GlobalEvent> recentActivityList = new List<GlobalEvent>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 GlobalEvent recentEventInfo = new GlobalEvent
                 {
@@ -393,7 +393,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<GlobalEvent> globalEventsActivityList = new List<GlobalEvent>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 GlobalEvent globalEventInfo = new GlobalEvent
                 {
@@ -427,7 +427,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             GlobalEventTypesDistribution globalEventTypesDistribution = new GlobalEventTypesDistribution()
             {
-                informationalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[0][0]),
+                informationalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable!.Rows[0][0]),
                 warningEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[1][0]),
                 highImpactEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[2][0]),
                 criticalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[3][0])
@@ -452,7 +452,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<GlobalEventCadenceRegistry> globalEventCadenceStats = new List<GlobalEventCadenceRegistry>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 GlobalEventCadenceRegistry globalEventCadenceRecord = new GlobalEventCadenceRegistry
                 {
@@ -480,7 +480,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PGridBasicInfo> pgridsBasicInfoList = new List<PGridBasicInfo>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 PGridBasicInfo pgridBasicInfo = new PGridBasicInfo
                 (

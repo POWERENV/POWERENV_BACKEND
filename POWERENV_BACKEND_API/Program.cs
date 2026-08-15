@@ -1,3 +1,5 @@
+#pragma warning disable ASP0000
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using POWER_ENV.GLOBAL.NETWORK;
 using POWERENV_BACKEND_API.Redis;

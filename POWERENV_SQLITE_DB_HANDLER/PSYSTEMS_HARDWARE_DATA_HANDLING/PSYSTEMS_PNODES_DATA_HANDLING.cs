@@ -23,7 +23,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             PNodeFullInfo pnodeFullInfo = new PNodeFullInfo();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 pnodeFullInfo = new PNodeFullInfo()
                 {
@@ -54,9 +54,16 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
-            PNodeFSPInfo pnodeFSPInfo = new PNodeFSPInfo();
+            PNodeFSPInfo pnodeFSPInfo = new PNodeFSPInfo()
+            {
+                FSPID = -1,
+                FSPASMIUsername = "",
+                FSPASMIPasswordHash = "",
+                FSPASMIVersion = "",
+                FSPASMILocalTime = ""
+            };
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 string passphrase = "";
 
@@ -89,9 +96,14 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
-            PNodeMachineInfo pnodeMachineInfo = new PNodeMachineInfo();
+            PNodeMachineInfo pnodeMachineInfo = new PNodeMachineInfo() {
+                pnode_system_model_name = "",
+                pnode_machine_type_model = "",
+                pnode_machine_serial_number = "",
+                pnode_system_pseries = ""
+            };
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 pnodeMachineInfo = new PNodeMachineInfo()
                 {
@@ -118,7 +130,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PNodeNICInfo> pnodeNICsInfo = new List<PNodeNICInfo>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 PNodeNICInfo pnodeIndividualNICInfo = new PNodeNICInfo
                 {
@@ -156,7 +168,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PNodeETHAccessPolicyInfo> pnodeETHAccessPoliciesInfo = new List<PNodeETHAccessPolicyInfo>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 PNodeETHAccessPolicyInfo pnodeIndividualNICInfo = new PNodeETHAccessPolicyInfo()
                 {
@@ -185,7 +197,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<NodesLoginAudits> pnodesLoginAudits = new List<NodesLoginAudits>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 NodesLoginAudits pnodeLoginAudit = new NodesLoginAudits
                 {
@@ -216,7 +228,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 PNodesSingleOperationHistory ppoolPNodesSingleOperationLog = new PNodesSingleOperationHistory()
                 {
@@ -250,7 +262,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<FSPErrorLogInfo> pnodeErrorLogs = new List<FSPErrorLogInfo>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 List<string> actionFlags = new List<string>();
                 string[] a = ((string)(connectionInfo.resultsDataTable.Rows[i][6])).Split(", ");
@@ -296,7 +308,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             List<LPARBasicInfo> lparsInfo = new List<LPARBasicInfo>();
 
-            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable!.Rows.Count; i++)
             {
                 LPARBasicInfo lparInfo = new LPARBasicInfo
                 {
@@ -325,8 +337,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             AuthInfo osAuthInfo = new AuthInfo(
-                (string)(connectionInfo.resultsDataTable.Rows[0][1]),
-                (string)(connectionInfo.resultsDataTable.Rows[0][2])
+                (string)(connectionInfo.resultsDataTable!.Rows[0][1]),
+                (string)(connectionInfo.resultsDataTable!.Rows[0][2])
             );
 
             LPARFullInfo osInfo = new LPARFullInfo
@@ -403,17 +415,17 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
             SQL_QUERY_PARAMETER[] SQLQueryParameters = {
                 new SQL_QUERY_PARAMETER { Name = "pnode_id", Value = _newNICInfo.pnode_id },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_mac_address", Value = _newNICInfo.pnode_nic_mac_address },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address", Value = _newNICInfo.pnode_nic_ip_address },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address_type", Value = _newNICInfo.pnode_nic_ip_address_type },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_subnet_mask", Value = _newNICInfo.pnode_nic_subnet_mask },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_default_gateway", Value = _newNICInfo.pnode_nic_default_gateway },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_hostname", Value = _newNICInfo.pnode_nic_hostname },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_domain_name", Value = _newNICInfo.pnode_nic_domain_name },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_first_dns_ip_address", Value = _newNICInfo.pnode_nic_first_dns_ip_address },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_second_dns_ip_address", Value = _newNICInfo.pnode_nic_second_dns_ip_address },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_third_dns_ip_address", Value = _newNICInfo.pnode_nic_third_dns_ip_address },
-                new SQL_QUERY_PARAMETER { Name = "pnode_nic_type", Value = _newNICInfo.pnode_nic_type }
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_mac_address", Value = _newNICInfo.pnode_nic_mac_address! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address", Value = _newNICInfo.pnode_nic_ip_address! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_ip_address_type", Value = _newNICInfo.pnode_nic_ip_address_type! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_subnet_mask", Value = _newNICInfo.pnode_nic_subnet_mask! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_default_gateway", Value = _newNICInfo.pnode_nic_default_gateway! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_hostname", Value = _newNICInfo.pnode_nic_hostname! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_domain_name", Value = _newNICInfo.pnode_nic_domain_name! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_first_dns_ip_address", Value = _newNICInfo.pnode_nic_first_dns_ip_address! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_second_dns_ip_address", Value = _newNICInfo.pnode_nic_second_dns_ip_address! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_third_dns_ip_address", Value = _newNICInfo.pnode_nic_third_dns_ip_address! },
+                new SQL_QUERY_PARAMETER { Name = "pnode_nic_type", Value = _newNICInfo.pnode_nic_type! }
             };
 
             PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
@@ -525,8 +537,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public int DBPNodeEditDateTime(int _pnodeID, string _date, string _time)
         {
-            string tempDATE = null;
-            string tempTIME = _time;
+            string? tempDATE = null;
+            string? tempTIME = _time;
 
             if (_date != null) tempDATE = $"{_date.Split("-")[2]}-{_date.Split("-")[0]}-{_date.Split("-")[1]}";
 
@@ -551,7 +563,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         {
             string actionFlags = "";
 
-            for (int i = 0; i < _currErrorLog.ActionFlags.Count - 1; i++)
+            for (int i = 0; i < _currErrorLog.ActionFlags!.Count - 1; i++)
             {
                 actionFlags += $"{_currErrorLog.ActionFlags[i]}, ";
             }

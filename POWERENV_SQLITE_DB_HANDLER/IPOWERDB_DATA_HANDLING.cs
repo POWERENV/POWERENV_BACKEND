@@ -12,9 +12,9 @@ namespace POWERENV_DB_HANDLER
 
     public class SQL_QUERY_PARAMETER
     {
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public string? SQLType { get; set; }
-        public object Value { get; set; }
+        public required object? Value { get; set; }
     }
 
     /// <summary>
@@ -22,7 +22,6 @@ namespace POWERENV_DB_HANDLER
     /// </summary>
     public interface IDB_DATA_HANDLING
     {
-        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER { get; set; }
         public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor);
         public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure);
     }
