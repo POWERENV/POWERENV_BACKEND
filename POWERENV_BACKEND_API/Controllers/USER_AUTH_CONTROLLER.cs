@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
+using System.Security.Claims;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -99,7 +99,7 @@ namespace POWERENV_BACKEND_API.Controllers
             var loginResponse = await Login(new LoginRequest() { Email = request.Email, Password = request.Password });
             response = (Program.STRUCT_REQUEST_DATA)(loginResponse as OkObjectResult).Value;
 
-            if(response.operationStatus == true)
+            if (response.operationStatus == true)
             {
                 response.statusMessage = "Signup successful. Session backed by Redis.";
             }
@@ -160,7 +160,7 @@ namespace POWERENV_BACKEND_API.Controllers
             {
                 return null; // User not found
             }
-            else if(userProfileInfo.user_id == -1)
+            else if (userProfileInfo.user_id == -1)
             {
                 return null; // User not found (despite having a result line returned by the validation query, all column values are null)
             }

@@ -72,7 +72,8 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 for (int i = 0; i < authLogs.Count; i++)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits loginAudit = new PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits {
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits loginAudit = new PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits
+                    {
                         login_audit_location = authLogs[i].location,
                         login_audit_datetime = $"{authLogs[i].date} {authLogs[i].time}",
                         login_audit_fsp_user = authLogs[i].user,
@@ -92,7 +93,7 @@ namespace POWERENV_BACKEND_API.Controllers
                     }
                 }
 
-                if(response.statusMessage == null)
+                if (response.statusMessage == null)
                 {
                     response.operationStatus = true;
                     response.statusMessage = "Login Audits retrieved successfully!";

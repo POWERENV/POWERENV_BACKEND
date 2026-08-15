@@ -81,7 +81,7 @@
 
         public void Logout()
         {
-            if(tc != null)
+            if (tc != null)
             {
                 if (tc.IsConnected)
                 {

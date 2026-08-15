@@ -13,6 +13,7 @@ namespace POWERENV_DB_HANDLER
     public class SQL_QUERY_PARAMETER
     {
         public string Name { get; set; }
+        public string? SQLType { get; set; }
         public object Value { get; set; }
     }
 

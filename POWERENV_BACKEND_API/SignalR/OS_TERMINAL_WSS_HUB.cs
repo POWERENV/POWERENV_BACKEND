@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 using StackExchange.Redis;
 using System.Text.Json;
-using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
 
 namespace POWERENV_BACKEND_API.SignalR
 {
@@ -18,7 +18,7 @@ namespace POWERENV_BACKEND_API.SignalR
             string strSessionId = httpContext.Request.Query["sessionId"];
             int sessionID = -1;
 
-            if(int.TryParse(strSessionId, out sessionID))
+            if (int.TryParse(strSessionId, out sessionID))
             {
                 redisCache = (IConnectionMultiplexer)httpContext.RequestServices.GetService(typeof(IConnectionMultiplexer));
 

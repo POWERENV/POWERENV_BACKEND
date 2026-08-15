@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using POWER_ENV;
+using POWER_ENV.GLOBAL.NETWORK;
 using POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER;
-using System.Linq.Expressions;
 using System.Security.Claims;
+using static POWER_ENV.FSP_MGMT;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
 
 namespace POWERENV_BACKEND_API.Controllers
@@ -20,7 +22,7 @@ namespace POWERENV_BACKEND_API.Controllers
             public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsList> ppoolsInfoList { get; set; }
             public PSYSTEMS_HARDWARE_DATA_HANDLING.PGridFullInfo pgridFullInfo { get; set; }
         }
-        
+
         private record PPoolInsights
         {
             public PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo { get; set; }
@@ -43,10 +45,19 @@ namespace POWERENV_BACKEND_API.Controllers
             public List<PSYSTEMS_HARDWARE_DATA_HANDLING.PNodeETHAccessPolicyInfo> pnodeETHAccessPolicies { get; set; }
         }
 
+        public record NewPNodeMachineSyncCredentials
+        {
+            public required string COMPort { get; set; }
+            public required string username { get; set; }
+            public required string password { get; set; }
+        }
+
+        private POWERENV POWERENVEngine;
         private POWERDB_PGSQL_DATA_HANDLING DB_HANDLER;
 
         public SQLITE_DATA_CONTROLLER()
         {
+            POWERENVEngine = new POWERENV();
             DB_HANDLER = new POWERDB_PGSQL_DATA_HANDLING(AppContext.BaseDirectory);
         }
 
@@ -142,7 +153,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 response.operationStatus = true;
                 response.statusMessage = "New PGrid successfully created!";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.operationStatus = false;
                 response.statusMessage = $"New PGrid creation operation failed! Error: {ex.Message}";
@@ -183,7 +194,7 @@ namespace POWERENV_BACKEND_API.Controllers
             PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolFullInfo ppoolFullInfo = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolFullInfo(_ppoolID);
             List<PSYSTEMS_HARDWARE_DATA_HANDLING.NodesLoginAudits> ppoolLoginAudits = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsLoginAudits(_ppoolID);
             List<PSYSTEMS_HARDWARE_DATA_HANDLING.AttentionLEDPNodesInfo> ppoolAttentionLEDMarkedPNodes = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolAttentionLEDPNodes(_ppoolID);
-            List <PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsErrorLogs(_ppoolID);
+            List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> ppoolErrorLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsErrorLogs(_ppoolID);
             PSYSTEMS_HARDWARE_DATA_HANDLING.PPoolsOperationHistory ppoolOperationLogs = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPPoolsOperationLogs(_ppoolID);
 
             PPoolInsights ppoolInsights = new PPoolInsights()
@@ -193,7 +204,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 ppoolLoginAudits = ppoolLoginAudits,
                 ppoolAttentionLEDMarkedPNodes = ppoolAttentionLEDMarkedPNodes,
                 ppoolErrorLogs = ppoolErrorLogs,
-                ppoolOperationLogs= ppoolOperationLogs
+                ppoolOperationLogs = ppoolOperationLogs
             };
 
             response.operationStatus = true;
@@ -294,6 +305,64 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
+        [HttpPost("syncNewPNodeMachine")]
+        public IActionResult DBSyncNewPNodeMachine([FromBody] NewPNodeMachineSyncCredentials credentialsBundle)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                STRUCT_MACHINE_INFO systemInfo = new STRUCT_MACHINE_INFO();
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                POWERENVEngine.Main(credentialsBundle.COMPort);
+                systemInfo = POWERENV.FspMgmt.GetMachineInfo();
+                Thread.Sleep(2000); // Wait for 2 seconds to ensure the command is processed
+                POWERENVEngine.CloseSerialConnection();
+
+                POWERENVEngine.Main(credentialsBundle.COMPort);
+                STRUCT_NETWORK_INTERFACE networkInfo = POWERENV.NetworkMgmt.GetNetworkInterfaceConfigs(0);
+                Thread.Sleep(2000); // Wait for 5 seconds to ensure the command is processed
+                POWERENVEngine.CloseSerialConnection();
+
+                response.operationStatus = true;
+                response.statusMessage = "Machine Data Synchronized!";
+                response.packetData = new
+                {
+                    systemInfo,
+                    networkInfo
+                };
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"Machine synchronization operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPost("createNewPNode")]
+        public IActionResult DBCreateNewPNode([FromBody] CreatePNodeDataBundle pnodeInfo)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                int newPGridRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER.DBCreateNewPNode(userID, pnodeInfo.pnodeBasicInfo, pnodeInfo.pnodeFSPInfo, pnodeInfo.pnodeOSUserInfoType);
+
+                response.operationStatus = true;
+                response.statusMessage = "New PNode successfully created!";
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"New PNode creation operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost("pnode{_pnodeID}/changeReadme")]
         public IActionResult DBPNodeEditReadmeText([FromRoute] int _pnodeID, [FromBody] string newReadmeText)
         {
@@ -322,7 +391,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 response.operationStatus = true;
                 response.statusMessage = "PNode Readme successfully received!";
             }
-            catch(Exception error)
+            catch (Exception error)
             {
                 response.operationStatus = false;
                 response.statusMessage = $"PNode Readme updated, but operation log creation failed!!! Error: ${error}";

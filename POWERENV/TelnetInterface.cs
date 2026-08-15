@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Net.Sockets;
-using System.Threading;
+using System.Text;
 
 namespace XTELNET
 {
-    enum Verbs {
+    enum Verbs
+    {
         WILL = 251,
         WONT = 252,
         DO = 253,
@@ -30,7 +28,7 @@ namespace XTELNET
             tcpSocket = new TcpClient(Hostname, Port);
         }
 
-        public string Login(string Username, string Password, int LoginTimeOutMs, int MyRetryTimeOut, int MyRetryCount) 
+        public string Login(string Username, string Password, int LoginTimeOutMs, int MyRetryTimeOut, int MyRetryCount)
         {
             int NumTentativasLigacao = MyRetryCount;
             int j;
@@ -66,22 +64,22 @@ namespace XTELNET
                 throw new Exception("Falha na ligação: login prompt ko");
             }
 
-            
+
             WriteLine(Username + Environment.NewLine);
 
-            s+= Read();
+            s += Read();
             Console.WriteLine(s);
 
-           
+
 
             Thread.Sleep(1000);
-            
+
             // ENVIAR PALAVRA PASSE
             j = 1;
             s += Read();
             while (j <= NumTentativasLigacao && !s.TrimEnd().EndsWith(":"))
             {
-                 Console.WriteLine(s);
+                Console.WriteLine(s);
 
                 if (!s.TrimEnd().EndsWith(":"))
                 {
@@ -145,14 +143,14 @@ namespace XTELNET
         public void Write(string cmd)
         {
             if (!tcpSocket.Connected) return;
-            byte[] buf = System.Text.ASCIIEncoding.ASCII.GetBytes(cmd.Replace("\0xFF","\0xFF\0xFF"));
-            tcpSocket.GetStream().Write(buf,  0, buf.Length);
+            byte[] buf = System.Text.ASCIIEncoding.ASCII.GetBytes(cmd.Replace("\0xFF", "\0xFF\0xFF"));
+            tcpSocket.GetStream().Write(buf, 0, buf.Length);
         }
 
         public string Read()
         {
             if (!tcpSocket.Connected) return null;
-            StringBuilder sb=new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             do
             {
                 ParseTelnet(sb);
@@ -173,7 +171,7 @@ namespace XTELNET
                 int input = tcpSocket.GetStream().ReadByte();
                 switch (input)
                 {
-                    case -1 :
+                    case -1:
                         break;
                     case (int)Verbs.IAC:
                         // interpret as command
@@ -181,11 +179,11 @@ namespace XTELNET
                         if (inputverb == -1) break;
                         switch (inputverb)
                         {
-                            case (int)Verbs.IAC: 
+                            case (int)Verbs.IAC:
                                 //literal IAC = 255 escaped, so append char 255 to string
                                 sb.Append(inputverb);
                                 break;
-                            case (int)Verbs.DO: 
+                            case (int)Verbs.DO:
                             case (int)Verbs.DONT:
                             case (int)Verbs.WILL:
                             case (int)Verbs.WONT:
@@ -193,10 +191,10 @@ namespace XTELNET
                                 int inputoption = tcpSocket.GetStream().ReadByte();
                                 if (inputoption == -1) break;
                                 tcpSocket.GetStream().WriteByte((byte)Verbs.IAC);
-                                if (inputoption == (int)Options.SGA )
-                                    tcpSocket.GetStream().WriteByte(inputverb == (int)Verbs.DO ? (byte)Verbs.WILL:(byte)Verbs.DO); 
+                                if (inputoption == (int)Options.SGA)
+                                    tcpSocket.GetStream().WriteByte(inputverb == (int)Verbs.DO ? (byte)Verbs.WILL : (byte)Verbs.DO);
                                 else
-                                    tcpSocket.GetStream().WriteByte(inputverb == (int)Verbs.DO ? (byte)Verbs.WONT : (byte)Verbs.DONT); 
+                                    tcpSocket.GetStream().WriteByte(inputverb == (int)Verbs.DO ? (byte)Verbs.WONT : (byte)Verbs.DONT);
                                 tcpSocket.GetStream().WriteByte((byte)inputoption);
                                 break;
                             default:
@@ -204,7 +202,7 @@ namespace XTELNET
                         }
                         break;
                     default:
-                        sb.Append( (char)input );
+                        sb.Append((char)input);
                         break;
                 }
             }

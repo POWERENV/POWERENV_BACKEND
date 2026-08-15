@@ -1,7 +1,4 @@
-﻿using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
-using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
-
-namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
+﻿namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
     //============================PPOOL DATA HANDLING METHODS============================//
 
@@ -18,7 +15,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodesBasicInfo> pnodesInfoList = new List<PNodesBasicInfo>();
 
@@ -46,7 +43,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PPoolFullInfo pgridFullInfo = new PPoolFullInfo();
 
@@ -78,7 +75,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
@@ -110,7 +107,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
@@ -137,7 +134,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPpool }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
             for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
@@ -183,7 +180,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
@@ -217,7 +214,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPPoolID", Value = _targetPPoolID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PPoolsBatchOperationHistory> ppoolBatchOperationHistory = new List<PPoolsBatchOperationHistory>();
 
@@ -249,7 +246,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetUserID", Value = _targetUserID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PPoolsBatchOperationHistory> ppoolBatchOperationHistory = new List<PPoolsBatchOperationHistory>();
 
@@ -300,7 +297,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "newReadmeText", Value = newReadmeText }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
             return connectionInfo.rowsAffected;
         }
 
@@ -321,7 +318,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "ppoolAssociatedPGridID", Value = newPPoolInfo.ppool_parent_pgrid_id}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
             return connectionInfo.rowsAffected;
         }
 
@@ -336,7 +333,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "ppoolID", Value = ppool_id}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }

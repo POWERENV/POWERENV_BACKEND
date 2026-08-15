@@ -1,6 +1,5 @@
 ﻿using Npgsql;
-using System.Runtime.InteropServices.Marshalling;
-using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+using NpgsqlTypes;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
@@ -8,7 +7,8 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     {
         #region VARIABLE_DEFINITION
 
-        string connectionString;
+        private string connectionString;
+        private POWERDB_PGSQL_DATA_HANDLING PARENT_DB_HANDLER;
 
         public record AccessPolicyInfo
         {
@@ -79,11 +79,25 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             public int ppoolPnodesCount { get; set; }
             public List<PNodesBasicInfo> pnodesList { get; set; }
         };
+
         public record PNodesBasicInfo
         {
             public int pnodeID { get; set; }
             public string pnodeName { get; set; }
             public int pnodeLparsCount { get; set; }
+        };
+
+        public record PNodesBasicInfoPGSQLCompositeType
+        {
+            [PgName("pnodeid")] public int PNodeID { get; set; }
+            [PgName("nickname")] public string NickName { get; set; }
+            [PgName("systemmodelname")] public string SystemModelName { get; set; }
+            [PgName("systemmachinetypemodel")] public string SystemMachineTypeModel { get; set; }
+            [PgName("systemmachineserialnumber")]  public string SystemMachineSerialNumber { get; set; }
+            [PgName("systempseries")]  public string SystemPSeries { get; set; }
+            [PgName("parentppoolid")] public int ParentPPoolID { get; set; }
+            [PgName("readmetext")]  public string ReadmeText { get; set; }
+            [PgName("serialcomport")] public string SerialCOMPort { get; set; }
         };
 
         public record PGridFullInfo
@@ -164,11 +178,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public record PNodeFSPInfo
         {
-            public int pnode_fsp_id { get; set; }
-            public string pnode_fsp_asmi_version { get; set; }
-            public string pnode_fsp_asmi_username { get; set; }
-            public string pnode_fsp_asmi_password_hash { get; set; }
-            public string pnode_fsp_asmi_local_datetime { get; set; }
+            [PgName("fspid")] public int FSPID { get; set; }
+            [PgName("fspasmiusername")] public string FSPASMIUsername { get; set; }
+            [PgName("fspasmipasswordhash")] public string FSPASMIPasswordHash { get; set; }
+            [PgName("fspasmiversion")] public string FSPASMIVersion { get; set; }
+            [PgName("fspasmilocaltime")] public string FSPASMILocalTime { get; set; }
         };
 
         public record PNodeNICInfo
@@ -250,6 +264,15 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             int os_lpar_id
         );
 
+        public record OSUserInfoPGSQLCompositeType
+        {
+            [PgName("osid")] public int OSID { get; set; }
+            [PgName("osusername")] public string OSUsername { get; set; }
+            [PgName("ospasswordhash")] public string OSPasswordHash { get; set; }
+            [PgName("osipaddress")] public string OSIPAddress { get; set; }
+            [PgName("osfamily")] public string OSFamily { get; set; }
+        };
+
         public record OSConnSessionInfo
         {
             public int? session_id { get; set; }
@@ -290,9 +313,18 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             hour
         }
 
+        public record CreatePNodeDataBundle
+        {
+            public required PNodesBasicInfoPGSQLCompositeType pnodeBasicInfo { get; set; }
+            public required PNodeFSPInfo pnodeFSPInfo { get; set; }
+            public required OSUserInfoPGSQLCompositeType pnodeOSUserInfoType { get; set; }
+        }
+
         #endregion VARIABLE_DEFINITION
 
-        public PSYSTEMS_HARDWARE_DATA_HANDLING(string dataSourceDirPath) {
+        public PSYSTEMS_HARDWARE_DATA_HANDLING(string dataSourceDirPath, POWERDB_PGSQL_DATA_HANDLING _parentDBHandler)
+        {
+            PARENT_DB_HANDLER = _parentDBHandler;
             string DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
             string DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
             string DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
@@ -304,8 +336,13 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             else throw new Exception("FATAL ERROR: DATABASE KEYS NOT FOUND!");
 
             NpgsqlDataSourceBuilder dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
-            dataSourceBuilder.MapComposite<FSPErrorLogFRUInfo>("ERROR_LOG_NHFRU_RECORD_LIST_TYPE");
+            dataSourceBuilder.MapComposite<FSPErrorLogFRUInfo>("public.error_log_nhfru_record_list_type");
+            dataSourceBuilder.MapComposite<PNodesBasicInfoPGSQLCompositeType>("public.pnode_basic_info_type");
+            dataSourceBuilder.MapComposite<PNodeFSPInfo>("public.pnode_fsp_info_type");
+            dataSourceBuilder.MapComposite<OSUserInfoPGSQLCompositeType>("public.pnode_os_user_info_type");
             NpgsqlDataSource dataSource = dataSourceBuilder.Build();
+
+            PARENT_DB_HANDLER.ConnectionDataSource = dataSource;
         }
 
         public List<GlobalEvent> DBGetRecentActivity(int userID)
@@ -318,7 +355,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<GlobalEvent> recentActivityList = new List<GlobalEvent>();
 
@@ -352,7 +389,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<GlobalEvent> globalEventsActivityList = new List<GlobalEvent>();
 
@@ -386,9 +423,10 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
-            GlobalEventTypesDistribution globalEventTypesDistribution = new GlobalEventTypesDistribution() {
+            GlobalEventTypesDistribution globalEventTypesDistribution = new GlobalEventTypesDistribution()
+            {
                 informationalEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[0][0]),
                 warningEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[1][0]),
                 highImpactEventsCount = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[2][0]),
@@ -410,11 +448,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER() {Name = "timeScaleUnit", Value = timeScaleUnit == enum_timeScaleUnit.day ? "day" : (timeScaleUnit == enum_timeScaleUnit.hour ? "hour" : "")}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<GlobalEventCadenceRegistry> globalEventCadenceStats = new List<GlobalEventCadenceRegistry>();
 
-            for(int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 GlobalEventCadenceRegistry globalEventCadenceRecord = new GlobalEventCadenceRegistry
                 {
@@ -438,7 +476,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER() {Name = "userID", Value = userID}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PGridBasicInfo> pgridsBasicInfoList = new List<PGridBasicInfo>();
 

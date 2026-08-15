@@ -1,12 +1,11 @@
-﻿using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
-
-namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
+﻿namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
     public class USER_DATA_HANDLING
     {
         #region VARIABLE DEFINITION
 
-        string connectionString;
+        private string connectionString;
+        private POWERDB_PGSQL_DATA_HANDLING PARENT_DB_HANDLER;
 
         public record UserProfileInfo
         {
@@ -48,8 +47,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         #endregion
 
-        public USER_DATA_HANDLING(string dataSourceDirPath)
+        public USER_DATA_HANDLING(string dataSourceDirPath, POWERDB_PGSQL_DATA_HANDLING _parentDBHandler)
         {
+            PARENT_DB_HANDLER = _parentDBHandler;
             string DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
             string DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
             string DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
@@ -70,11 +70,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "user_email", Value = _userEmail }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters);
 
             UserProfileInfo userProfile = new UserProfileInfo();
 
-            for(int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
+            for (int i = 0; i < connectionInfo.resultsDataTable.Rows.Count; i++)
             {
                 userProfile = new UserProfileInfo
                 {
@@ -110,7 +110,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "user_password_hash", Value = newUserFormData.Password }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 
@@ -124,7 +124,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "userID", Value = userID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NotificationInfo> notificationInfoList = new List<NotificationInfo>();
 
@@ -158,7 +158,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "userID", Value = userID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NotificationInfo> notificationInfoList = new List<NotificationInfo>();
 
@@ -193,7 +193,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "NotificationID", Value = notificationID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
     }

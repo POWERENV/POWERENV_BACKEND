@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Reflection.PortableExecutable;
-using System.Threading.Tasks;
-using System.Linq;
-
-namespace POWER_ENV
+﻿namespace POWER_ENV
 {
     public class FSP_MGMT
     {
@@ -70,7 +63,7 @@ namespace POWER_ENV
             POWERENV.SendCommand("2", 200);
             POWERENV.SendCommand("1", 200);
 
-            if(!POWERENV.GetReceivedData().Contains("No error/event logs to display."))
+            if (!POWERENV.GetReceivedData().Contains("No error/event logs to display."))
             {
                 POWERENV.SendCommand("1", 200);
                 POWERENV.GetReceivedData(); //Clear the buffer
@@ -87,7 +80,7 @@ namespace POWER_ENV
                     POWERENV.GetReceivedData(); //Clear the buffer
                     POWERENV.SendCommand(errorIndex, 1200);
                     string errorRawData = POWERENV.GetReceivedData();
-                    if(errorIndex == "97")
+                    if (errorIndex == "97")
                     {
                         errorIndex = "1";
                         POWERENV.SendCommand(errorIndex, 1200);
@@ -214,7 +207,7 @@ namespace POWER_ENV
             STRUCT_MACHINE_INFO machineInfo = new STRUCT_MACHINE_INFO();
 
 
-            for (int i = 0; i< splitedResponse.Length; i++)
+            for (int i = 0; i < splitedResponse.Length; i++)
             {
                 if (splitedResponse[i].Contains("Machine type-model"))
                 {
@@ -238,7 +231,7 @@ namespace POWER_ENV
             response = POWERENV.GetReceivedData();
             splitedResponse = response.Split("\n");
 
-            for(int i = 0; i < splitedResponse.Length; i++)
+            for (int i = 0; i < splitedResponse.Length; i++)
             {
                 if (splitedResponse[i].Contains("Version"))
                 {

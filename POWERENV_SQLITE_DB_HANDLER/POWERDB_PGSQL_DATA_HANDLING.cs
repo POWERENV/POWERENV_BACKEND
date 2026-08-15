@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using System.Data;
-using System.Transactions;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
@@ -9,9 +8,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     /// </summary>
     public class PGSQL_DB_CONNECTION_INFO : ICONNECTION_INFO
     {
-        public NpgsqlConnection conn { get; set; }
-        public NpgsqlDataReader reader { get; set; }
-        public DataTable resultsDataTable { get; set; }
+        public required NpgsqlConnection conn { get; set; }
+        public NpgsqlDataReader? reader { get; set; }
+        public DataTable? resultsDataTable { get; set; }
         public int rowsAffected { get; set; }
     }
 
@@ -20,14 +19,16 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
     /// </summary>
     public class POWERDB_PGSQL_DATA_HANDLING : IDB_DATA_HANDLING
     {
-        private static POWERDB_PGSQL_DATA_HANDLING autoInstance;
+        //private static POWERDB_PGSQL_DATA_HANDLING autoInstance;
+        private NpgsqlDataSource connectionDataSource;
         private PSYSTEMS_HARDWARE_DATA_HANDLING hardwareDataHandler;
         private USER_DATA_HANDLING userDataHandler;
 
         /// <summary>
         /// Property for the actual POWERENV data interaction methods class.
         /// </summary>
-        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER {
+        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER
+        {
             get => hardwareDataHandler;
             set => hardwareDataHandler = value;
         }
@@ -40,6 +41,27 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             get => userDataHandler;
             set => userDataHandler = value;
         }
+        /*public static NpgsqlDataSource ConnectionDataSource {
+            get {
+                if(autoInstance != null) return autoInstance.connectionDataSource;
+                return null;
+            }
+            set {
+                if (autoInstance != null) autoInstance.connectionDataSource = value;
+            }
+        }*/
+
+        public NpgsqlDataSource ConnectionDataSource
+        {
+            get
+            {
+                return connectionDataSource;
+            }
+            set
+            {
+                connectionDataSource = value;
+            }
+        }
 
         /// <summary>
         /// POWERDB_PGSQL_DATA_HANDLING class constructor
@@ -47,9 +69,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="dataSourceDirPath"></param>
         public POWERDB_PGSQL_DATA_HANDLING(string dataSourceDirPath, bool initializeAutoInstance = true)
         {
-            HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath);
-            USER_DATA_HANDLER = new USER_DATA_HANDLING(dataSourceDirPath);
-            if (initializeAutoInstance) autoInstance = new POWERDB_PGSQL_DATA_HANDLING(dataSourceDirPath, false);
+            //if (initializeAutoInstance) autoInstance = new POWERDB_PGSQL_DATA_HANDLING(dataSourceDirPath, false);
+            HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath, this);
+            USER_DATA_HANDLER = new USER_DATA_HANDLING(dataSourceDirPath, this);
         }
 
         //###########################################################################################
@@ -65,8 +87,10 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         public ICONNECTION_INFO intReadQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor)
         {
             DataTable resultDataTable = new DataTable();
-            PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO();
-            connectionInfo.conn = new NpgsqlConnection(_connectionString);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO()
+            {
+                conn = ConnectionDataSource.CreateConnection()
+            };
             connectionInfo.conn.Open();
 
             using NpgsqlTransaction transaction = connectionInfo.conn.BeginTransaction();
@@ -99,7 +123,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                     transaction.Rollback();
                 }
                 catch (InvalidOperationException) { }
-                
+
                 connectionInfo.conn.Close();
                 throw;
             }
@@ -113,9 +137,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
+        internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, bool hasCursor = false)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), hasCursor);
+            return (PGSQL_DB_CONNECTION_INFO)intReadQueryFromDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), hasCursor);
         }
 
         /// <summary>
@@ -125,9 +149,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="_sqlCommandText"></param>
         /// <param name="parameters"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor = false)
+        internal PGSQL_DB_CONNECTION_INFO readQueryFromDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool hasCursor = false)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intReadQueryFromDB(_connectionString, _sqlCommandText, parameters, hasCursor);
+            return (PGSQL_DB_CONNECTION_INFO)intReadQueryFromDB(_connectionString, _sqlCommandText, parameters, hasCursor);
         }
 
         /// <summary>
@@ -139,8 +163,10 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <returns>ICONNECTION_INFO packet object.</returns>
         public ICONNECTION_INFO intWriteDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure)
         {
-            PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO();
-            connectionInfo.conn = new NpgsqlConnection(_connectionString);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = new PGSQL_DB_CONNECTION_INFO()
+            {
+                conn = ConnectionDataSource.CreateConnection()
+            };
             connectionInfo.conn.Open();
 
             using NpgsqlTransaction transaction = connectionInfo.conn.BeginTransaction();
@@ -151,7 +177,16 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
                 for (int i = 0; i < parameters.Length; i++)
                 {
-                    cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                    var param = cmd.Parameters.AddWithValue(parameters[i].Name, parameters[i].Value);
+                    if (parameters[i].SQLType != null) param.DataTypeName = parameters[i].SQLType;
+                }
+
+                // "DataTypes" returns a DataTable containing all types cached by the driver
+                DataTable dataTypesTable = connectionInfo.conn.GetSchema("DataTypes");
+
+                foreach (DataRow row in dataTypesTable.Rows)
+                {
+                    Console.WriteLine($"Type Name: {row["TypeName"]} | OID: {row["ProviderDbType"]}");
                 }
 
                 if (isStoredProcedure)
@@ -177,7 +212,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 transaction.Commit();
                 connectionInfo.conn.Close();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (connectionInfo.reader != null && !connectionInfo.reader.IsClosed) connectionInfo.reader.Close();
 
@@ -200,9 +235,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="_connectionString"></param>
         /// <param name="_sqlCommandText"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = true)
+        internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, bool isStoredProcedure = true)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), isStoredProcedure);
+            return (PGSQL_DB_CONNECTION_INFO)intWriteDataOnDB(_connectionString, _sqlCommandText, Array.Empty<SQL_QUERY_PARAMETER>(), isStoredProcedure);
         }
 
         /// <summary>
@@ -212,9 +247,9 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         /// <param name="_sqlCommandText"></param>
         /// <param name="parameters"></param>
         /// <returns>PGSQL_DB_CONNECTION_INFO packet object.</returns>
-        static internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure = true)
+        internal PGSQL_DB_CONNECTION_INFO writeDataOnDB(string _connectionString, string _sqlCommandText, SQL_QUERY_PARAMETER[] parameters, bool isStoredProcedure = true)
         {
-            return (PGSQL_DB_CONNECTION_INFO)autoInstance.intWriteDataOnDB(_connectionString, _sqlCommandText, parameters, isStoredProcedure);
+            return (PGSQL_DB_CONNECTION_INFO)intWriteDataOnDB(_connectionString, _sqlCommandText, parameters, isStoredProcedure);
         }
     }
 }

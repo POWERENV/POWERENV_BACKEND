@@ -9,7 +9,7 @@ namespace POWER_ENV
             POWERENV.CheckSerialSessionOpen();
 
             POWERENV.AuthManagementLib.ASMIAuthenticate();
-            
+
             POWERENV.SendCommand("1", 200);
             POWERENV.SendCommand("1", 200);
             POWERENV.SendCommand("8", 200);
@@ -44,7 +44,7 @@ namespace POWER_ENV
         {
             POWERENV.CheckSerialSessionOpen();
             POWERENV.AuthManagementLib.ASMIAuthenticate();
-            
+
             POWERENV.SendCommand("4", 500);
             POWERENV.SendCommand("13", 200);
             POWERENV.SendCommand("1", 200);

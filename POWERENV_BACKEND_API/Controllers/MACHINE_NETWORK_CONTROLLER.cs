@@ -321,7 +321,7 @@ namespace POWERENV_BACKEND_API.Controllers
         {
             List<Program.STRUCT_REQUEST_DATA> responsesList = new List<STRUCT_REQUEST_DATA>();
 
-            for(int i = 0; i < rowsAffected.Length; i++)
+            for (int i = 0; i < rowsAffected.Length; i++)
             {
                 Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
                 if (rowsAffected[i] >= 1)

@@ -36,7 +36,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 int dateUpdateRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBPNodeEditDateTime(_systemID, _newDate, null);
 
-                if(dateUpdateRowsAffected > 0)
+                if (dateUpdateRowsAffected > 0)
                 {
                     response.operationStatus = true;
                     response.statusMessage = "System date set successfully.";

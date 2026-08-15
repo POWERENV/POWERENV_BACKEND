@@ -35,7 +35,8 @@ namespace POWERENV_BACKEND_API
             string? hostIPAddress = Environment.GetEnvironmentVariable("POWERENV_HOST_IPADDRESS");
             Console.WriteLine($"POWERENV_HOST_IPADDRESS: {hostIPAddress}");
 
-            if (hostIPAddress == null) {
+            if (hostIPAddress == null)
+            {
                 Console.WriteLine("POWERENV_HOST_IPADDRESS environment variable is not set.");
                 Console.WriteLine("Please set the environment variable and restart the application.");
                 return;

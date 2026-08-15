@@ -1,6 +1,4 @@
-﻿using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
-
-namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
+﻿namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
     public partial class PSYSTEMS_HARDWARE_DATA_HANDLING
     {
@@ -17,7 +15,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PGridFullInfo pgridFullInfo = new PGridFullInfo { };
 
@@ -49,7 +47,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AccessPolicyInfo> accessPolicies = new List<AccessPolicyInfo>();
 
@@ -81,7 +79,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AccessAuditInfo> pgridAccessAudits = new List<AccessAuditInfo>();
 
@@ -110,7 +108,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NodesLoginAudits> pgridPnodesLoginAudits = new List<NodesLoginAudits>();
 
@@ -142,7 +140,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<FSPErrorLogInfo> pgridPnodesErrorLogs = new List<FSPErrorLogInfo>();
 
@@ -189,7 +187,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<AttentionLEDPNodesInfo> attentionLEDMarkedPNodesInfo = new List<AttentionLEDPNodesInfo>();
 
@@ -216,7 +214,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPgridID", Value = _targetPgridID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PPoolsList> ppoolsInfoList = new List<PPoolsList>();
 
@@ -255,7 +253,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "pgridOwnerId", Value = userID}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -271,7 +269,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "pgridID", Value = pgrid_id}
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }

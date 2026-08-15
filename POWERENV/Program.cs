@@ -1,9 +1,9 @@
 ﻿#pragma warning disable 8600
 #pragma warning disable 8604
 
-using System.IO.Ports;
-using POWER_ENV.GLOBAL.NETWORK;
 using POWER_ENV._9111_285__SF240_202;
+using POWER_ENV.GLOBAL.NETWORK;
+using System.IO.Ports;
 
 namespace POWER_ENV
 {
@@ -226,7 +226,7 @@ namespace POWER_ENV
             Console.WriteLine(receivedData);
         }
 
-        static private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e) {}
+        static private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e) { }
 
         /// <summary>
         /// POWER_ENV: Static method to check if the serial session is open.

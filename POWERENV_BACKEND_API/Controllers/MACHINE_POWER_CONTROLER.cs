@@ -21,7 +21,7 @@ namespace POWERENV_BACKEND_API.Controllers
             POWERENVEngine = new POWERENV();
             DB_HANDLER = new POWERDB_PGSQL_DATA_HANDLING(AppContext.BaseDirectory);
         }
-        
+
         [HttpGet("{_systemID}/poweron")]
         public IActionResult SysPowerOn([FromRoute] int _systemID)
         {
@@ -39,7 +39,8 @@ namespace POWERENV_BACKEND_API.Controllers
                 string userName = User.FindFirst(ClaimTypes.Name)?.Value;
                 string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeFullInfo(_systemID).pnode_nickname;
 
-                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory() {
+                PNodesSingleOperationHistory PowerOnOperationData = new PNodesSingleOperationHistory()
+                {
                     operationCatName = "POWER",
                     operationSourcePNodeID = _systemID,
                     operationAction = "NodePowerOn",
@@ -48,7 +49,7 @@ namespace POWERENV_BACKEND_API.Controllers
                     operationCompletionStatus = pnodeActivenessStateUpdateRowsAffected > 0 ? "SUCCESS" : "FAILURE",
                     operationSourceUserName = userName
                 };
-                
+
                 int pnodePowerOnOperationRegistryRowsAffected = DB_HANDLER.HARDWARE_DATA_HANDLER.DBInsertPNodeSingleOperation(PowerOnOperationData);
 
                 if (pnodeActivenessStateUpdateRowsAffected >= 1 && pnodePowerOnOperationRegistryRowsAffected >= 1)
@@ -58,7 +59,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 }
                 else throw new Exception("System powered on, but database not updated (database write fail)!");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 response.operationStatus = false;
                 response.statusMessage = ex.Message;

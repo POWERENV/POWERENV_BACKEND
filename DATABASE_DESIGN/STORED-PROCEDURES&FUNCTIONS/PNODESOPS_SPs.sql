@@ -683,17 +683,9 @@ AS $$
     END;
 $$;
 
-SELECT * FROM PNODES;
-
-SELECT * FROM PNODE_STATUS;
-
-BEGIN TRANSACTION;
-CALL SP_GET_PNODE_FSP_INFO(1, 'CURSOR');
-FETCH ALL FROM "CURSOR";
-COMMIT;
-
 CREATE TYPE PNODE_BASIC_INFO_TYPE AS
 (
+    PNodeID INTEGER,
     NickName VARCHAR,
     SystemModelName VARCHAR,
     SystemMachineTypeModel VARCHAR,
@@ -706,20 +698,34 @@ CREATE TYPE PNODE_BASIC_INFO_TYPE AS
 
 CREATE TYPE PNODE_FSP_INFO_TYPE AS
 (
+    FSPID INTEGER,
     FSPASMIUsername VARCHAR,
     FSPASMIPasswordHash VARCHAR,
     FSPASMIVersion VARCHAR,
     FSPASMILocalTime VARCHAR
 );
 
+CREATE TYPE PNODE_OS_USER_INFO_TYPE AS
+(
+    OSID INTEGER,
+    OSUsername VARCHAR,
+    OSPasswordHash VARCHAR,
+    OSIPAddress VARCHAR,
+    OSFamily VARCHAR
+);
+
 CREATE OR REPLACE PROCEDURE SP_CREATE_PNODE (
     pnodeBasicInfo PNODE_BASIC_INFO_TYPE,
     pnodeFSPInfo PNODE_FSP_INFO_TYPE,
+    pnodeOSUserInfoType PNODE_OS_USER_INFO_TYPE,
     OUT _rowsAffected INT
 )
 LANGUAGE plpgsql
 AS $$
-    DECLARE _CURRENT_TIME_ZONE VARCHAR; _NEW_FSP_INFO_RECORD_ID INTEGER;
+    DECLARE _CURRENT_TIME_ZONE VARCHAR;
+        _NEW_FSP_INFO_RECORD_ID INTEGER;
+        _NEW_OS_INSTANCE_ID INTEGER;
+        _NEW_PNODE_ID INTEGER;
     BEGIN
         SELECT default_timezone
         INTO _CURRENT_TIME_ZONE
@@ -762,6 +768,34 @@ AS $$
             pnodeBasicInfo.ParentPPoolID,
             pnodeBasicInfo.ReadmeText,
             pnodeBasicInfo.SerialCOMPort
+        )
+        RETURNING PNODE_ID INTO _NEW_PNODE_ID;
+
+        INSERT INTO PNODE_OS_USER_INFO (
+            PNODE_OS_USERNAME,
+            PNODE_OS_PASSWORD_HASH,
+            PNODE_OS_IP_ADDRESS,
+            PNODE_OS_FAMILY
+        ) VALUES (
+        pnodeOSUserInfoType.osusername,
+        pnodeOSUserInfoType.ospasswordhash,
+        pnodeOSUserInfoType.osipaddress,
+        pnodeOSUserInfoType.osfamily
+        )
+        RETURNING PNODE_OS_ID INTO _NEW_OS_INSTANCE_ID;
+
+        INSERT INTO LPARS (
+            LPAR_NAME,
+            LPAR_ASSOCIATED_OS_INSTANCE_ID,
+            LPAR_IS_MAIN_PNODE_OS,
+            LPAR_ASSOCIATED_PNODE_ID,
+            LPAR_STORAGE_SIZE
+        ) VALUES (
+        'DEFAULT_LPAR',
+        _NEW_OS_INSTANCE_ID,
+        TRUE,
+        _NEW_PNODE_ID,
+        200
         );
 
         GET DIAGNOSTICS _rowsAffected = ROW_COUNT;

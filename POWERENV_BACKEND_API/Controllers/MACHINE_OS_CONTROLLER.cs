@@ -25,7 +25,7 @@ namespace POWERENV_BACKEND_API.Controllers
         public async Task<IActionResult> openOSSession([FromRoute] int pnode_id, IConnectionMultiplexer redis)
         {
             Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
-            
+
             try
             {
                 IDatabase db = redis.GetDatabase();
@@ -35,7 +35,8 @@ namespace POWERENV_BACKEND_API.Controllers
                 PSYSTEMS_HARDWARE_DATA_HANDLING.LPARFullInfo targetLPARID = DB_HANDLER.HARDWARE_DATA_HANDLER.DBGetPNodeMainOSLPARInfo(pnode_id);
                 bool canProceed = false;
 
-                do {
+                do
+                {
                     // Generate a random 6-digit token
                     newToken = rndEngine.Next(100000, 999999);
 
@@ -45,7 +46,8 @@ namespace POWERENV_BACKEND_API.Controllers
                     if (!currDBQueueList.Contains(newToken)) canProceed = true;
                 } while (!canProceed);
 
-                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo {
+                PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo newSessionInfo = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo
+                {
                     session_id = newToken,
                     WSSListenerConnectionID = "-1",
                     sessionTargetLPARInfo = targetLPARID,
@@ -106,9 +108,9 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 RedisValue[] currDBQueueList = await db.ListRangeAsync("osSessionQueue", 0, -1);
 
-                if(currDBQueueList.Length > 0)
+                if (currDBQueueList.Length > 0)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo { };
                     string targetSessionSerialized = string.Empty;
 
                     int c = 0;
@@ -156,7 +158,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 if (currDBQueueList.Length > 0)
                 {
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo{};
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo targetSession = new PSYSTEMS_HARDWARE_DATA_HANDLING.OSConnSessionInfo { };
                     string targetSessionSerialized = string.Empty;
 
                     int c = 0;

@@ -25,7 +25,8 @@ namespace POWER_ENV
             public string os_family { get; set; }
         }
 
-        private STRUCT_AUTH_INFO machine_auth_info = new STRUCT_AUTH_INFO() {
+        private STRUCT_AUTH_INFO machine_auth_info = new STRUCT_AUTH_INFO()
+        {
             username = "admin",
             password = "Password123"
         };

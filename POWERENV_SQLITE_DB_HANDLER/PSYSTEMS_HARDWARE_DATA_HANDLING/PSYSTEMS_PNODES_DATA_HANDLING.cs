@@ -1,6 +1,7 @@
-﻿using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.POWERDB_PGSQL_DATA_HANDLING;
+﻿using Npgsql;
+using NpgsqlTypes;
+using System.Data;
 using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.PSYSTEMS_HARDWARE_DATA_HANDLING;
-using static POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER.USER_DATA_HANDLING;
 
 namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 {
@@ -18,7 +19,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeFullInfo pnodeFullInfo = new PNodeFullInfo();
 
@@ -51,7 +52,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeFSPInfo pnodeFSPInfo = new PNodeFSPInfo();
 
@@ -66,11 +67,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
                 pnodeFSPInfo = new PNodeFSPInfo()
                 {
-                    pnode_fsp_id = (int)(connectionInfo.resultsDataTable.Rows[i][0]),
-                    pnode_fsp_asmi_version = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
-                    pnode_fsp_asmi_username = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
-                    pnode_fsp_asmi_password_hash = passphrase,
-                    pnode_fsp_asmi_local_datetime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][4]).ToString()
+                    FSPID = (int)(connectionInfo.resultsDataTable.Rows[i][0]),
+                    FSPASMIVersion = (string)(connectionInfo.resultsDataTable.Rows[i][1]),
+                    FSPASMIUsername = (string)(connectionInfo.resultsDataTable.Rows[i][2]),
+                    FSPASMIPasswordHash = passphrase,
+                    FSPASMILocalTime = ((DateTime)connectionInfo.resultsDataTable.Rows[i][4]).ToString()
                 };
             }
 
@@ -86,7 +87,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             PNodeMachineInfo pnodeMachineInfo = new PNodeMachineInfo();
 
@@ -113,7 +114,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodeNICInfo> pnodeNICsInfo = new List<PNodeNICInfo>();
 
@@ -151,7 +152,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodeETHAccessPolicyInfo> pnodeETHAccessPoliciesInfo = new List<PNodeETHAccessPolicyInfo>();
 
@@ -180,7 +181,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNode", Value = _targetPNode }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<NodesLoginAudits> pnodesLoginAudits = new List<NodesLoginAudits>();
 
@@ -211,7 +212,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNodeID", Value = _targetPNodeID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<PNodesSingleOperationHistory> ppoolPNodesSingleOperationHistory = new List<PNodesSingleOperationHistory>();
 
@@ -245,7 +246,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "targetPNode", Value = _targetPNode }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<FSPErrorLogInfo> pnodeErrorLogs = new List<FSPErrorLogInfo>();
 
@@ -291,7 +292,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "PNode_ID", Value = PNode_ID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             List<LPARBasicInfo> lparsInfo = new List<LPARBasicInfo>();
 
@@ -321,7 +322,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "PNode_ID", Value = PNode_ID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.readQueryFromDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             AuthInfo osAuthInfo = new AuthInfo(
                 (string)(connectionInfo.resultsDataTable.Rows[0][1]),
@@ -360,7 +361,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "newActivenessStateID", Value = newActivenessStateID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
 
             return connectionInfo.rowsAffected;
         }
@@ -378,7 +379,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "newLEDState", Value = newLEDState }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
 
             return connectionInfo.rowsAffected;
         }
@@ -415,7 +416,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "pnode_nic_type", Value = _newNICInfo.pnode_nic_type }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -435,7 +436,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "access_policy_type", Value = newETHAccessPolicy.access_policy_type }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -455,7 +456,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "access_policy_id", Value = _updatedPolicy.access_policy_id }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -473,7 +474,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "access_policy_pnode_id", Value = ETHAccessPolicy.access_policy_pnode_id }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -499,7 +500,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "operationSeverityLevelID", Value = OperationData.operationSeverityLevelID ?? 1 }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -517,7 +518,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "newReadmeText", Value = newReadmeText }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -542,7 +543,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "time", Value = tempTIME }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 
@@ -550,7 +551,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
         {
             string actionFlags = "";
 
-            for(int i = 0; i < _currErrorLog.ActionFlags.Count - 1; i++)
+            for (int i = 0; i < _currErrorLog.ActionFlags.Count - 1; i++)
             {
                 actionFlags += $"{_currErrorLog.ActionFlags[i]}, ";
             }
@@ -587,7 +588,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "NormalHardwareFRU", Value = _currErrorLog.NormalHardwareFRU }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
 
             return connectionInfo.rowsAffected;
         }
@@ -601,7 +602,7 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "errorLogDBID", Value = errorLogDBID }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
             return connectionInfo.rowsAffected;
         }
 
@@ -623,7 +624,28 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
                 new SQL_QUERY_PARAMETER { Name = "login_audit_location", Value = loginAudit.login_audit_location }
             };
 
-            PGSQL_DB_CONNECTION_INFO connectionInfo = writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+            return connectionInfo.rowsAffected;
+        }
+
+        public int DBCreateNewPNode(int userID, PNodesBasicInfoPGSQLCompositeType pnodeBasicInfo, PNodeFSPInfo pnodeFSPInfo, OSUserInfoPGSQLCompositeType pnodeOSUserInfoType)
+        {
+            string sqlCommandText = $"CALL SP_CREATE_PNODE(" +
+                $"@pnodeBasicInfo," +
+                $"@pnodeFSPInfo," +
+                $"@pnodeOSUserInfoType," +
+                $"NULL" +
+                $");";
+
+            pnodeFSPInfo.FSPASMILocalTime = $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day}";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeBasicInfo", Value = pnodeBasicInfo, SQLType = "public.pnode_basic_info_type" },
+                new SQL_QUERY_PARAMETER { Name = "pnodeFSPInfo", Value = pnodeFSPInfo, SQLType = "public.pnode_fsp_info_type" },
+                new SQL_QUERY_PARAMETER { Name = "pnodeOSUserInfoType", Value = pnodeOSUserInfoType, SQLType = "public.pnode_os_user_info_type" }
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters);
             return connectionInfo.rowsAffected;
         }
 

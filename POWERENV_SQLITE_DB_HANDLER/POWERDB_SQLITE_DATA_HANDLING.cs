@@ -24,7 +24,8 @@ namespace POWERENV_DB_HANDLER.POWERDB_SQLITE_DATA_HANDLING
         /// <summary>
         /// Property for the actual POWERENV data interaction methods class.
         /// </summary>
-        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER {
+        public PSYSTEMS_HARDWARE_DATA_HANDLING HARDWARE_DATA_HANDLER
+        {
             get => hardwareDataHandler;
             set => hardwareDataHandler = value;
         }
@@ -34,8 +35,8 @@ namespace POWERENV_DB_HANDLER.POWERDB_SQLITE_DATA_HANDLING
         /// </summary>
         public POWERDB_SQLITE_DATA_HANDLING(string dataSourceDirPath, bool initializeAutoInstance = true)
         {
-            HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath);
-            if(initializeAutoInstance) autoInstance = new POWERDB_SQLITE_DATA_HANDLING(dataSourceDirPath, false);
+            //HARDWARE_DATA_HANDLER = new PSYSTEMS_HARDWARE_DATA_HANDLING(dataSourceDirPath);
+            if (initializeAutoInstance) autoInstance = new POWERDB_SQLITE_DATA_HANDLING(dataSourceDirPath, false);
         }
 
         //########################################################################################

@@ -44,7 +44,7 @@ namespace POWERENV_OSCONSOLE_WORKER
             }
             catch (Exception ex)
             {
-                if(numTries < maxReddisConnectionAttempts)
+                if (numTries < maxReddisConnectionAttempts)
                 {
                     Console.WriteLine($"Failed to connect to Redis cache. Attempt {numTries}/{maxReddisConnectionAttempts}. Retrying...");
                     await Task.Delay(1000); // Wait for 2 seconds before retrying

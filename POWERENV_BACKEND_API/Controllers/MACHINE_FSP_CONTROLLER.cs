@@ -79,7 +79,8 @@ namespace POWERENV_BACKEND_API.Controllers
                         fruInfoList.Add(_FSP_ERROR_LOG_FRU_INFO);
                     }
 
-                    PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo currentErrorLog = new PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo() {
+                    PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo currentErrorLog = new PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo()
+                    {
                         ErrorLogID = errorLogInfo[i].ErrorLogID,
                         LogDate = POWERENV.DatetimeMgmt.changeDateStringFormat(errorLogInfo[i].LogDate.Replace("/", "-"), new int[] { 2, 0, 1 }), // Convert date format from MM/DD/YYYY to YYYY-MM-DD
                         LogTime = errorLogInfo[i].LogTime,
@@ -105,7 +106,7 @@ namespace POWERENV_BACKEND_API.Controllers
                     }
                 }
 
-                if(response.statusMessage == null)
+                if (response.statusMessage == null)
                 {
                     response.operationStatus = true;
                     response.statusMessage = "FSP Errors successfully retrieved.";
@@ -183,7 +184,7 @@ namespace POWERENV_BACKEND_API.Controllers
                     response.operationStatus = false;
                     response.statusMessage = "ASMI Session started, but database not updated (internal parameter mismatch)!";
                 }
-                
+
                 response.packetData = receivedData;
             }
             catch (Exception ex)
@@ -237,7 +238,7 @@ namespace POWERENV_BACKEND_API.Controllers
 
         private bool listContainsErrorLog(List<PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo> dbErrorLogs, PSYSTEMS_HARDWARE_DATA_HANDLING.FSPErrorLogInfo errorLog)
         {
-            for(int i = 0; i < dbErrorLogs.Count; i++)
+            for (int i = 0; i < dbErrorLogs.Count; i++)
             {
                 if (dbErrorLogs[i].ErrorLogID == errorLog.ErrorLogID)
                 {

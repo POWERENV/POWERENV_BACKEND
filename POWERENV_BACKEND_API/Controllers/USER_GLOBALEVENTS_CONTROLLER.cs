@@ -37,7 +37,8 @@ namespace POWERENV_BACKEND_API.Controllers
 
                 response.operationStatus = true;
                 response.statusMessage = "Global Events retrieved successfully!";
-                response.packetData = new {
+                response.packetData = new
+                {
                     NotificationsListInfo,
                     GlobalEventsDistribution,
                     GlobalEventsCadenceStats,

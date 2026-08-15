@@ -26,7 +26,7 @@ namespace POWERENV_BACKEND_API.Controllers
                 string? strUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 int userId = -1;
 
-                if(!int.TryParse(strUserId, out userId)) throw new Exception("Can't parse UserId authentication cookie string to integer.");
+                if (!int.TryParse(strUserId, out userId)) throw new Exception("Can't parse UserId authentication cookie string to integer.");
 
                 List<NotificationInfo> NotificationsListInfo = DB_HANDLER.USER_DATA_HANDLER.DBGetUserNotifications(userId);
                 response.operationStatus = true;
