@@ -802,4 +802,20 @@ AS $$
     END;
 $$;
 
+CREATE OR REPLACE PROCEDURE SP_DELETE_PNODE (
+    _PNODE_ID INTEGER,
+    OUT _rowsAffected INT
+)
+LANGUAGE plpgsql
+AS $$
+    DECLARE
+    BEGIN
+        DELETE
+        FROM PNODES
+        WHERE PNODE_ID = _PNODE_ID;
+
+        GET DIAGNOSTICS _rowsAffected = ROW_COUNT;
+    END;
+$$;
+
 --endregion

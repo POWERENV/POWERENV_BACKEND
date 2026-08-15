@@ -661,6 +661,22 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
             return connectionInfo.rowsAffected;
         }
 
+        public int DBDeletePNode(int userID, int pnode_id)
+        {
+            string sqlCommandText = $"CALL SP_DELETE_PNODE(" +
+                $"@pnodeID," +
+                $"NULL" +
+                $");";
+
+            SQL_QUERY_PARAMETER[] SQLQueryParameters = {
+                new SQL_QUERY_PARAMETER { Name = "pnodeID", Value = pnode_id}
+            };
+
+            PGSQL_DB_CONNECTION_INFO connectionInfo = PARENT_DB_HANDLER.writeDataOnDB(connectionString, sqlCommandText, SQLQueryParameters, true);
+
+            return connectionInfo.rowsAffected;
+        }
+
         #endregion WRITE
     }
 }

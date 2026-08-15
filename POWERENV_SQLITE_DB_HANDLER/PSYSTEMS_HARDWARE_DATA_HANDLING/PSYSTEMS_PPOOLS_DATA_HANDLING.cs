@@ -59,7 +59,8 @@
                     ppool_last_update_datetime = ((DateTime)(connectionInfo.resultsDataTable.Rows[i][5])).ToString(),
                     ppool_readme_text = (string)(connectionInfo.resultsDataTable.Rows[i][6]),
                     ppool_pnodes_count = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][7]),
-                    ppool_active_pnodes_count = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][8])
+                    ppool_active_pnodes_count = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][8]),
+                    ppool_parent_pgrid_id = Convert.ToInt32(connectionInfo.resultsDataTable.Rows[i][9])
                 };
             }
 

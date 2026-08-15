@@ -363,6 +363,29 @@ namespace POWERENV_BACKEND_API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("deletePNode_{pnode_id}")]
+        public IActionResult DBDeletePNode([FromRoute] int pnode_id)
+        {
+            Program.STRUCT_REQUEST_DATA response = new Program.STRUCT_REQUEST_DATA();
+
+            try
+            {
+                int userID = Convert.ToInt32(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                string pnodeNickname = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBGetPNodeFullInfo(pnode_id).pnode_nickname!;
+                int newPNodeRowsChanged = DB_HANDLER.HARDWARE_DATA_HANDLER!.DBDeletePNode(userID, pnode_id);
+
+                response.operationStatus = true;
+                response.statusMessage = $"PNode successfully deleted!";
+            }
+            catch (Exception ex)
+            {
+                response.operationStatus = false;
+                response.statusMessage = $"PNode deletion operation failed! Error: {ex.Message}";
+            }
+
+            return Ok(response);
+        }
+
         [HttpPost("pnode{_pnodeID}/changeReadme")]
         public IActionResult DBPNodeEditReadmeText([FromRoute] int _pnodeID, [FromBody] string newReadmeText)
         {
