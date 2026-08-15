@@ -70,7 +70,7 @@ CREATE OR REPLACE TRIGGER TG_PPOOL_DELETE
 
 --============================================================================================
 
-CREATE OR REPLACE FUNCTION FN_TRIGGER_PNODE_DELETE()
+CREATE OR REPLACE FUNCTION FN_TRIGGER_PNODE_BEFORE_DELETE()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
@@ -107,10 +107,50 @@ AS $$
     END;
 $$;
 
-CREATE OR REPLACE TRIGGER TG_PNODE_DELETE
+CREATE OR REPLACE TRIGGER TG_PNODE_BEFORE_DELETE
     BEFORE DELETE ON PNODES
     FOR EACH ROW
-    EXECUTE FUNCTION FN_TRIGGER_PNODE_DELETE();
+    EXECUTE FUNCTION FN_TRIGGER_PNODE_BEFORE_DELETE();
+
+--============================================================================================
+
+CREATE OR REPLACE FUNCTION FN_TRIGGER_PNODE_AFTER_DELETE()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+    BEGIN
+        DELETE
+        FROM PNODES_FSP_INFO
+        WHERE pnode_fsp_id = OLD.PNODE_FSP_ID;
+
+        RETURN OLD;
+    END;
+$$;
+
+CREATE OR REPLACE TRIGGER TG_PNODE_AFTER_DELETE
+    AFTER DELETE ON PNODES
+    FOR EACH ROW
+    EXECUTE FUNCTION FN_TRIGGER_PNODE_AFTER_DELETE();
+
+--============================================================================================
+
+CREATE OR REPLACE FUNCTION FN_TRIGGER_LPAR_AFTER_DELETE()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+    BEGIN
+        DELETE
+        FROM PNODE_OS_USER_INFO
+        WHERE PNODE_OS_ID = OLD.LPAR_ASSOCIATED_OS_INSTANCE_ID;
+
+        RETURN OLD;
+    END;
+$$;
+
+CREATE OR REPLACE TRIGGER TG_LPAR_AFTER_DELETE
+    AFTER DELETE ON LPARS
+    FOR EACH ROW
+    EXECUTE FUNCTION FN_TRIGGER_LPAR_AFTER_DELETE();
 
 --============================================================================================
 

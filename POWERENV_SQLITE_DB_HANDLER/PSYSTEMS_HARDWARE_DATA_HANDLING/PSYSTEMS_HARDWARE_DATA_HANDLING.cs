@@ -42,11 +42,11 @@ namespace POWERENV_DB_HANDLER.POWERENV_PGSQL_DB_HANDLER
 
         public record FSPErrorLogFRUInfo
         {
-            public required string Priority { get; set; }
-            public required string LocationCode { get; set; }
-            public required string PartNumber { get; set; }
-            public required string CCIN { get; set; }
-            public required string SerialNumber { get; set; }
+            [PgName("priority")] public required string Priority { get; set; }
+            [PgName("locationcode")] public required string LocationCode { get; set; }
+            [PgName("partnumber")] public required string PartNumber { get; set; }
+            [PgName("serialnumber")]  public required string SerialNumber { get; set; }
+            [PgName("ccin")] public required string CCIN { get; set; }
         };
 
         public record FSPErrorLogInfo
