@@ -3,6 +3,7 @@
 .github/
 
 LOCAL_ONLY/
+aspire-output/
 
 [Dd]ebug/
 [Rr]elease/

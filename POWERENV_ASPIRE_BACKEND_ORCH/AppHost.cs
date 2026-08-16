@@ -72,6 +72,9 @@ switch (executionMode)
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
+// 1. Tell Aspire you want to host/publish into a Docker Compose layout
+builder.AddDockerComposeEnvironment("production-env");
+
 IResourceBuilder<RedisResource> redisCache = builder.AddRedis("RedisCache").WithContainerRuntimeArgs("-p", "6379:6379"); // Maps all interfaces (0.0.0.0) by default
 
 builder.AddProject<Projects.POWERENV_BACKEND_API>("MAIN-API").WithReference(redisCache);
