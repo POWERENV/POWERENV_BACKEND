@@ -50,9 +50,9 @@
         public USER_DATA_HANDLING(string dataSourceDirPath, POWERDB_PGSQL_DATA_HANDLING _parentDBHandler)
         {
             PARENT_DB_HANDLER = _parentDBHandler;
-            string DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
-            string DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
-            string DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
+            string? DBPassword = Environment.GetEnvironmentVariable("POWERENV_DB_PASSWORD");
+            string? DBIPAddress = Environment.GetEnvironmentVariable("POWERENV_DB_IPADDRESS");
+            string? DBPort = Environment.GetEnvironmentVariable("POWERENV_DB_PORT");
 
             if (DBPassword != null)
             {
