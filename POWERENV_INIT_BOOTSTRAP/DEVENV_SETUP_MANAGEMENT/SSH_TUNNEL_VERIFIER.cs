@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ASPIRE_DEVENV_SETUP_MANAGEMENT
+namespace POWERENV_INIT_BOOTSTRAP.DEVENV_SETUP_MANAGEMENT
 {
     internal record SSHTunnelComplianceCheckArgs();
     internal record SSHTunnelCreateArgs(string targetMachineIPAddress, string targetUserName);

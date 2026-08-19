@@ -9,6 +9,7 @@ namespace POWER_ENV
 {
     public class POWERENV
     {
+        // FIELDS
         static private SerialPort serialCOMPort = new SerialPort();
         static private POWER_MGMT powerManagementLib = new POWER_MGMT();
         static private AUTH_MGMT authManagementLib = new AUTH_MGMT();
@@ -16,6 +17,7 @@ namespace POWER_ENV
         static private NETWORK_MGMT networkMgmt = new NETWORK_MGMT();
         static private FSP_MGMT fspMgmt = new FSP_MGMT();
 
+        // PROPERTIES
         public static POWER_MGMT PowerManagementLib { get => powerManagementLib; }
         public static AUTH_MGMT AuthManagementLib { get => authManagementLib; }
         public static DATETIME_MGMT DatetimeMgmt { get => datetimeMgmt; }
@@ -23,6 +25,7 @@ namespace POWER_ENV
         public static SerialPort SerialCOMPort { get => serialCOMPort; }
         public static FSP_MGMT FspMgmt { get => fspMgmt; }
 
+        // METHODS
         public void Main(string comPort)
         {
             powerManagementLib = new POWER_MGMT();
@@ -39,6 +42,56 @@ namespace POWER_ENV
             if (serialCOMPort.IsOpen)
             {
                 serialCOMPort.Close();
+            }
+        }
+
+        static private void InitializeCOMPort(string comPortIndex)
+        {
+            serialCOMPort = new SerialPort(comPortIndex, 19200, Parity.None, 8, StopBits.One);
+            serialCOMPort.Handshake = Handshake.None;
+            serialCOMPort.NewLine = "\n";
+            serialCOMPort.DataReceived += SerialDataReceived;
+            serialCOMPort.Open();
+        }
+
+        static private void ChangeCOMPort(string portName)
+        {
+            if (serialCOMPort.IsOpen)
+            {
+                serialCOMPort.Close();
+            }
+            serialCOMPort.PortName = portName;
+            serialCOMPort.Open();
+        }
+
+        static public void SendCommand(string _command, short _awaitTime)
+        {
+            serialCOMPort.WriteLine(_command);
+            Thread.Sleep(_awaitTime);
+        }
+
+        static public string GetReceivedData()
+        {
+            return serialCOMPort.ReadExisting();
+        }
+
+        static public void PrintReceivedData()
+        {
+            string receivedData = serialCOMPort.ReadExisting();
+            Console.WriteLine(receivedData);
+        }
+
+        static private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e) { }
+
+        /// <summary>
+        /// POWER_ENV: Static method to check if the serial session is open.
+        /// </summary>
+        static public void CheckSerialSessionOpen()
+        {
+            if (!serialCOMPort.IsOpen)
+            {
+                Console.WriteLine("Serial port is not open. Please open the port before sending commands.");
+                return;
             }
         }
 
@@ -188,56 +241,6 @@ namespace POWER_ENV
                 }
             }
             while (command != "exit");
-        }
-
-        static private void InitializeCOMPort(string comPortIndex)
-        {
-            serialCOMPort = new SerialPort(comPortIndex, 19200, Parity.None, 8, StopBits.One);
-            serialCOMPort.Handshake = Handshake.None;
-            serialCOMPort.NewLine = "\n";
-            serialCOMPort.DataReceived += SerialDataReceived;
-            serialCOMPort.Open();
-        }
-
-        static private void ChangeCOMPort(string portName)
-        {
-            if (serialCOMPort.IsOpen)
-            {
-                serialCOMPort.Close();
-            }
-            serialCOMPort.PortName = portName;
-            serialCOMPort.Open();
-        }
-
-        static public void SendCommand(string _command, short _awaitTime)
-        {
-            serialCOMPort.WriteLine(_command);
-            Thread.Sleep(_awaitTime);
-        }
-
-        static public string GetReceivedData()
-        {
-            return serialCOMPort.ReadExisting();
-        }
-
-        static public void PrintReceivedData()
-        {
-            string receivedData = serialCOMPort.ReadExisting();
-            Console.WriteLine(receivedData);
-        }
-
-        static private void SerialDataReceived(object sender, SerialDataReceivedEventArgs e) { }
-
-        /// <summary>
-        /// POWER_ENV: Static method to check if the serial session is open.
-        /// </summary>
-        static public void CheckSerialSessionOpen()
-        {
-            if (!serialCOMPort.IsOpen)
-            {
-                Console.WriteLine("Serial port is not open. Please open the port before sending commands.");
-                return;
-            }
         }
     }
 }

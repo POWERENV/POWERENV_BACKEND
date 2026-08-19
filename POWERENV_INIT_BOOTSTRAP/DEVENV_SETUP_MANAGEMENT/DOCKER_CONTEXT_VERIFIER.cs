@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace ASPIRE_DEVENV_SETUP_MANAGEMENT
+namespace POWERENV_INIT_BOOTSTRAP.DEVENV_SETUP_MANAGEMENT
 {
     internal record DockerContextComplianceCheckArgs(string contextName);
     internal record DockerContextCreateArgs(string contextName, string targetMachineIPAddress, string targetUserName);
