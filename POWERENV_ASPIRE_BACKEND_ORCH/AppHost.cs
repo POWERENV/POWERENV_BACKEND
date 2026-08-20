@@ -47,7 +47,6 @@ IResourceBuilder<ProjectResource> initBootstrap = builder.AddProject<Projects.PO
     .WithRemoteImageTag("latest");
 
 IResourceBuilder<RedisResource> redisCache = builder.AddRedis("RedisCache")
-    .WithContainerRuntimeArgs("-p", "6379:6379")
     .WithHttpEndpoint(
         port: 6379,
         targetPort: 6379,
