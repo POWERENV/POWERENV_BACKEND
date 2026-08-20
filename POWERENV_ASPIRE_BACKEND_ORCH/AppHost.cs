@@ -48,12 +48,24 @@ IResourceBuilder<ProjectResource> initBootstrap = builder.AddProject<Projects.PO
 
 IResourceBuilder<RedisResource> redisCache = builder.AddRedis("RedisCache")
     .WithContainerRuntimeArgs("-p", "6379:6379")
+    .WithHttpEndpoint(
+        port: 6379,
+        targetPort: 6379,
+        name: "http",
+        isProxied: false)
+    .WithExternalHttpEndpoints()
     .WaitForCompletion(initBootstrap); // Maps all interfaces (0.0.0.0) by default
 
 builder.AddProject<Projects.POWERENV_BACKEND_API>("MAIN-API")
     .WithReference(redisCache)
     .WithContainerRegistry(registry)
     .WithRemoteImageTag("latest")
+    .WithHttpEndpoint(
+        port: 5000,
+        targetPort: 5000,
+        name: "http",
+        isProxied: false)
+    .WithExternalHttpEndpoints()
     .WithEnvironment("POWERENV_DB_IPADDRESS", environmentVariables[0])
     .WithEnvironment("POWERENV_DB_PASSWORD", environmentVariables[1])
     .WithEnvironment("POWERENV_DB_PORT", environmentVariables[2])
